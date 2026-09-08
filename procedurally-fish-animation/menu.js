@@ -79,7 +79,9 @@ function setupContextMenu(canvas) {
   function openMenu(horizontal, vertical) {
     closeSubmenu();
     pointerInside = false;
-    const items = [
+    const gameItem = { label: game.active ? 'Stop game' : 'Play game', icon: game.active ? 'square' : 'play', action: () => game.active ? stopGame() : startGame() };
+    const items = game.active ? [gameItem, { label: 'Restart game', icon: 'rotate-ccw', action: startGame }] : [
+      gameItem,
       { label: 'Restart', icon: 'rotate-ccw', action: resetFish },
       { label: 'See ...', icon: 'eye', children: () => ['0 - Spine', '1 - Body circles', '2 - Outline', '3 - Finished fish'].map((label, value) => ({ label, checked: stage === value, action: () => { stage = value; } })) },
       { label: 'Follow mouse', checked: followMouse, action: () => { followMouse = !followMouse; } },

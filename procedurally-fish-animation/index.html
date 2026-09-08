@@ -86,6 +86,50 @@
         pointer-events: none;
       }
       #recording-indicator[hidden] { display: none; }
+      #game-score {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        margin: 0;
+        padding: 8px 12px;
+        background: #ffffffd9;
+        color: #263b36;
+        font-size: 16px;
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+      }
+      #game-over {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        pointer-events: none;
+      }
+      #game-over[hidden] { display: none; }
+      #game-result {
+        margin: 0;
+        padding: 12px;
+        background: #f4f6f5ed;
+        font-size: 24px;
+        text-align: center;
+      }
+      #game-over button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border: 1px solid #263b36;
+        border-radius: 5px;
+        background: #d9f36b;
+        color: #263b36;
+        font: inherit;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      #game-over button svg { width: 18px; height: 18px; }
       #recording-indicator::before {
         content: "";
         width: 8px;
@@ -190,11 +234,17 @@
     <script defer src="separation.js"></script>
     <script defer src="menu.js"></script>
     <script defer src="index.js"></script>
+    <script defer src="game.js"></script>
     <script defer src="sequence.js"></script>
   </head>
   <body>
     <main></main>
     <p id="fps-counter" aria-label="Frames per second">-- FPS</p>
+    <p id="game-score" role="status" aria-live="polite" hidden>Score 0</p>
+    <div id="game-over" hidden>
+      <p id="game-result" role="status" aria-live="polite"></p>
+      <button type="button" onclick="startGame()"><i data-lucide="rotate-ccw" aria-hidden="true"></i>Play again</button>
+    </div>
     <div id="recording-indicator" role="status" aria-live="polite" hidden>Recording</div>
     <p id="menu-hint">right click to open menu</p>
     <div

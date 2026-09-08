@@ -117,11 +117,14 @@ function draw() {
     fpsStartedAt = now;
     fpsFrames = 0;
   }
-  if (playing) {
+  updateGame();
+  if (playing && (!game.active || gameCanRun())) {
     let remaining = Math.min(deltaTime / 1000, 0.04) * playbackSpeed;
     while (remaining > 0) {
       const elapsed = Math.min(remaining, 1 / 60);
       updateSchool(elapsed);
+      updateGame();
+      if (game.active && game.over) break;
       remaining -= elapsed;
     }
   }
@@ -139,6 +142,7 @@ function draw() {
     }
   }
   pop();
+  drawGame();
   if (pointerInside && pointerPosition) {
     push();
     translate(pointerPosition.x * width, pointerPosition.y * height);
@@ -238,7 +242,7 @@ function updateFish(elapsed) {
   const distance = Math.hypot(targetX, targetY);
   const orbitRadius = segmentLength * 8;
   const radialAngle = distance < fishScale ? heading - HALF_PI : Math.atan2(-targetY, -targetX);
-  const targetHeading = following
+  const targetHeading = following && !game.active
     ? radialAngle + HALF_PI + Math.atan((distance - orbitRadius) / (orbitRadius * 0.6))
     : Math.atan2(targetY, targetX);
   const avoidance = avoidanceHeading(instance, targetHeading, fishes);
@@ -611,6 +615,13 @@ function windowResized() {
   const canvasHeight = Math.max(1, windowHeight);
   if (width === windowWidth && height === canvasHeight) return;
   resizeCanvas(windowWidth, canvasHeight);
+  if (game.active) {
+    fishes.forEach(wrapFish);
+    separateFishes(fishes);
+    placeGameApple();
+    game.previousPointer = null;
+    return;
+  }
   resetFish();
 }
 
@@ -622,6 +633,7 @@ function setupControls(canvas) {
   canvas.style.cursor = 'none';
 
   canvas.addEventListener('dblclick', event => {
+    if (game.active) return;
     if (event.button !== 0) return;
     const bounds = canvas.getBoundingClientRect();
     const horizontal = viewCenter.x + ((event.clientX - bounds.left) / bounds.width - 0.5) * width / zoom;
@@ -641,6 +653,7 @@ function setupControls(canvas) {
     event.preventDefault();
     event.stopPropagation();
     if (event.repeat) return;
+    if (game.active && /^Numpad[0-3]$/.test(event.code)) return;
     if (/^Numpad[0-3]$/.test(event.code)) stage = Number(event.code.slice(-1));
     if (event.code === 'Numpad8') startRecording(canvas);
     if (event.code === 'Numpad9') stopRecording();
@@ -652,6 +665,7 @@ function setupControls(canvas) {
       x: constrain((event.clientX - bounds.left) / bounds.width, 0, 1),
       y: constrain((event.clientY - bounds.top) / bounds.height, 0, 1)
     };
+    updateGame();
   };
   canvas.addEventListener('pointermove', trackPointer);
   canvas.addEventListener('pointerdown', trackPointer);
@@ -662,6 +676,7 @@ function setupControls(canvas) {
     if (event.pointerType === 'touch') pointerInside = false;
   });
   canvas.addEventListener('keydown', event => {
+    if (game.active) return;
     if (event.key === ' ') { event.preventDefault(); setPlaying(!playing); }
     if (/^[0-3]$/.test(event.key)) stage = Number(event.key);
     if (event.key === '.') { setPlaying(false); updateSchool(playbackSpeed / 60); }

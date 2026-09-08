@@ -32,6 +32,21 @@ Built with p5.js, FIK inverse kinematics, and Canvas 2D.
 
 Recording requires browser support for canvas capture and MediaRecorder.
 
+### Play Mode
+
+Choose **Play game** from the right-click menu. Move the cursor onto the apple
+without touching a fish. Fish pursue the cursor continuously while avoiding
+each other, and the game stays at 25% zoom.
+
+Each apple adds one random fish and increases speed by 0.1x. The score and
+speed appear in the top-right corner. Touching a fish ends the run; choose
+**Play again** or **Restart game** to retry.
+
+The game pauses while the cursor is outside the canvas, the menu is open,
+or the window has lost focus. Sandbox editing controls are disabled during
+a run. Choose **Stop game** from the same menu to restore the previous school
+and settings.
+
 ## Structure
 
 ```text
@@ -43,6 +58,7 @@ procedurally-fish-animation/
   species.js                       Species profiles, fins, and patterns
   separation.js                    Collision avoidance and separation
   menu.js                          Context menu
+  game.js                          Apple game, scoring, and cursor collisions
   sequence.js                      Scripted recording sequence
 CNAME                              Custom domain for GitHub Pages
 _redirects                         Clean-URL redirects for compatible hosts

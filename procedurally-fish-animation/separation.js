@@ -93,6 +93,7 @@ function separateFishes(school, bounds = swimmingBounds()) {
 }
 
 const passingTurns = new WeakMap();
+const avoidanceBounds = new WeakMap();
 
 function commitSeparationTurn(fish, horizontal, vertical) {
   const previous = passingTurns.get(fish);
@@ -105,13 +106,25 @@ function commitSeparationTurn(fish, horizontal, vertical) {
 }
 
 function avoidanceHeading(fish, desired, school) {
+  let passing = passingTurns.get(fish);
+  if (passing && fish.swimTime < passing.until) return { angle: passing.angle, active: true };
   const bounds = swimmingBounds();
   const forwardX = Math.cos(fish.heading);
   const forwardY = Math.sin(fish.heading);
   let threat = null;
   for (const neighbour of school) {
     if (neighbour === fish) continue;
-    for (const disc of neighbour.collisionDiscs()) {
+    const discs = neighbour.collisionDiscs();
+    let cached = avoidanceBounds.get(neighbour);
+    if (!cached || cached.discs !== discs) {
+      cached = { discs, box: collisionBox(discs) };
+      avoidanceBounds.set(neighbour, cached);
+    }
+    const box = cached.box;
+    const gapX = Math.max(0, Math.abs(periodicDelta(box.x - fish.head.x, bounds.right - bounds.left)) - box.halfWidth);
+    const gapY = Math.max(0, Math.abs(periodicDelta(box.y - fish.head.y, bounds.bottom - bounds.top)) - box.halfHeight);
+    if (gapX * gapX + gapY * gapY > (fish.segmentLength * 13) ** 2) continue;
+    for (const disc of discs) {
       const differenceX = periodicDelta(disc.x - fish.head.x, bounds.right - bounds.left);
       const differenceY = periodicDelta(disc.y - fish.head.y, bounds.bottom - bounds.top);
       const forward = differenceX * forwardX + differenceY * forwardY;
@@ -123,8 +136,6 @@ function avoidanceHeading(fish, desired, school) {
       }
     }
   }
-  let passing = passingTurns.get(fish);
-  if (passing && fish.swimTime < passing.until) return { angle: passing.angle, active: true };
   if (!threat) {
     passingTurns.delete(fish);
     return { angle: desired, active: false };
