@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Procedural Fish</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #f4f6f5;
+        color: #263b36;
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: 0;
+      }
+      canvas {
+        display: block;
+        touch-action: none;
+        outline: none;
+      }
+      #menu-hint {
+        position: fixed;
+        right: 20px;
+        bottom: 16px;
+        max-width: calc(100vw - 40px);
+        margin: 0;
+        color: #697b74;
+        font-size: 36px;
+        text-align: right;
+        pointer-events: none;
+      }
+      #fps-counter {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        width: 82px;
+        margin: 0;
+        padding: 8px;
+        background: #ffffffd9;
+        color: #263b36;
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        pointer-events: none;
+      }
+      #recording-indicator {
+        position: fixed;
+        top: 56px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        background: #fff;
+        color: #a32b37;
+        font-size: 13px;
+        pointer-events: none;
+      }
+      #recording-indicator[hidden] { display: none; }
+      #recording-indicator::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #d63447;
+      }
+      .menu {
+        position: fixed;
+        z-index: 10;
+        width: 188px;
+        max-width: calc(100vw - 16px);
+        padding: 5px;
+        margin: 0;
+        border: 1px solid #d9e2dd;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow: 0 5px 22px #263b3626;
+        max-height: calc(100vh - 16px);
+        overflow-y: auto;
+      }
+      .menu[hidden] {
+        display: none;
+      }
+      .menu button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        height: 36px;
+        padding: 0 8px;
+        border: 0;
+        border-radius: 3px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+      }
+      .menu button:hover,
+      .menu button:focus-visible,
+      .menu button[aria-expanded="true"] {
+        background: #e8eff4;
+        outline: none;
+      }
+      .menu .label {
+        flex: 1;
+      }
+      .menu svg,
+      .menu .mark {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+      }
+      .menu [aria-checked="false"] .check {
+        visibility: hidden;
+      }
+      .swatch {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1px solid #0003;
+      }
+      #submenu {
+        z-index: 11;
+        width: 264px;
+      }
+      #submenu button {
+        height: auto;
+        min-height: 36px;
+        padding-top: 7px;
+        padding-bottom: 7px;
+      }
+      #submenu .label {
+        min-width: 0;
+        overflow-wrap: break-word;
+      }
+      @media (max-width: 480px) {
+        .menu {
+          width: 148px;
+        }
+        #submenu { width: 148px; }
+        .menu button {
+          font-size: 12px;
+          gap: 6px;
+          padding: 0 6px;
+        }
+      }
+    </style>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/gh/lo-th/fullik@gh-pages/build/fik.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script defer src="species.js"></script>
+    <script defer src="separation.js"></script>
+    <script defer src="menu.js"></script>
+    <script defer src="index.js"></script>
+    <script defer src="sequence.js"></script>
+  </head>
+  <body>
+    <main></main>
+    <p id="fps-counter" aria-label="Frames per second">-- FPS</p>
+    <div id="recording-indicator" role="status" aria-live="polite" hidden>Recording</div>
+    <p id="menu-hint">right click to open menu</p>
+    <div
+      id="context-menu"
+      class="menu"
+      role="menu"
+      aria-label="Fish controls"
+      hidden></div>
+    <div
+      id="submenu"
+      class="menu"
+      role="menu"
+      aria-label="Options"
+      hidden></div>
+  </body>
+</html>
