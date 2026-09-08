@@ -81,7 +81,7 @@ function setupContextMenu(canvas) {
     pointerInside = false;
     const items = [
       { label: 'Restart', icon: 'rotate-ccw', action: resetFish },
-      ...(typeof startVideoSequence === 'function' ? [{ label: 'Record sequence', icon: 'video', action: startVideoSequence }] : []),
+      { label: 'See ...', icon: 'eye', children: () => ['0 - Spine', '1 - Body circles', '2 - Outline', '3 - Finished fish'].map((label, value) => ({ label, checked: stage === value, action: () => { stage = value; } })) },
       { label: 'Follow mouse', checked: followMouse, action: () => { followMouse = !followMouse; } },
       { label: 'Speed', icon: 'gauge', children: () => [1, 2, 4].map(value => ({ label: `${value}x speed`, checked: playbackSpeed === value, action: () => { playbackSpeed = value; } })) },
       { label: 'Zoom', icon: 'zoom-in', children: () => [0.25, 0.5, 1].map(value => ({ label: `${value * 100}%`, checked: zoom === value, action: () => setZoom(value) })) },

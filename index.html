@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8faf7" />
+    <meta
+      name="description"
+      content="Small experiments for curious minds. An ever-growing collection of interactive things by Blue Edge." />
+    <title>Blue Edge Lab | A Place to Play</title>
+    <meta name="author" content="Blue Edge" />
+    <link rel="canonical" href="https://lab.blueedge.me/" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Blue Edge Lab" />
+    <meta property="og:title" content="Blue Edge Lab | A Place to Play" />
+    <meta property="og:description" content="Small experiments for curious minds. An ever-growing collection of interactive things by Blue Edge." />
+    <meta property="og:url" content="https://lab.blueedge.me/" />
+    <meta property="og:image" content="https://lab.blueedge.me/assets/fish-preview.png" />
+    <meta property="og:image:alt" content="Colorful procedural fish swimming in a pale green pond" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@blueedgetechno" />
+    <meta name="twitter:creator" content="@blueedgetechno" />
+    <meta name="twitter:title" content="Blue Edge Lab | A Place to Play" />
+    <meta name="twitter:description" content="Small experiments for curious minds. An ever-growing collection of interactive things by Blue Edge." />
+    <meta name="twitter:image" content="https://lab.blueedge.me/assets/fish-preview.png" />
+    <meta name="twitter:image:alt" content="Colorful procedural fish swimming in a pale green pond" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Blue Edge Lab",
+        "url": "https://lab.blueedge.me/",
+        "description": "Small experiments for curious minds. An ever-growing collection of interactive things by Blue Edge.",
+        "creator": {
+          "@type": "Person",
+          "name": "Blue Edge",
+          "url": "https://blueedge.me",
+          "sameAs": ["https://twitter.com/blueedgetechno"]
+        }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      :root {
+        --paper: #f8faf7;
+        --ink: #222d27;
+        --muted: #6b766e;
+        --line: #dbe3dc;
+        --green: #d9f36b;
+        --pink: #ffd5d8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100svh;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: "DM Sans", sans-serif;
+        letter-spacing: 0;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image: radial-gradient(#97a89a44 0.7px, transparent 0.7px);
+        background-size: 20px 20px;
+        mask-image: linear-gradient(black, transparent 80%);
+        pointer-events: none;
+      }
+      a {
+        color: inherit;
+      }
+      .shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100svh;
+        min-height: 100dvh;
+        max-width: 1240px;
+        padding: 0 48px;
+        margin: 0 auto;
+      }
+      main {
+        flex: 1;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 96px;
+        /* border-bottom: 1px solid var(--line); */
+        gap: 24px;
+      }
+      .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 19px;
+      }
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        background: var(--ink);
+        color: var(--green);
+        border-radius: 7px;
+        font-size: 22px;
+      }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        text-decoration: none;
+      }
+      .back-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      }
+      svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+      .intro {
+        padding: 67px 0 51px;
+      }
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 0 0 18px;
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+      .status-dot {
+        height: 7px;
+        width: 7px;
+        background: #608329;
+        border-radius: 50%;
+      }
+      h1 {
+        font:
+          700 76px/1.04 "Space Grotesk",
+          sans-serif;
+        margin: 0;
+        letter-spacing: 0;
+      }
+      h1 span {
+        display: inline-block;
+        color: #547334;
+      }
+      .intro p:last-child {
+        margin: 22px 0 0;
+        font-size: 18px;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+      .catalog-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 0 17px;
+        border-bottom: 1px solid var(--line);
+      }
+      h2 {
+        margin: 0;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .count {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 30px;
+        padding: 28px 0 70px;
+      }
+      .experiment {
+        display: block;
+        min-width: 0;
+        text-decoration: none;
+        outline-offset: 8px;
+      }
+      .thumbnail {
+        position: relative;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background: #e8f2ed;
+        border: 1px solid #c9d9ce;
+        border-radius: 8px;
+        transform: perspective(900px) rotateX(var(--tilt-x, 0deg))
+          rotateY(var(--tilt-y, 0deg));
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .thumbnail img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .new {
+        position: absolute;
+        top: 19px;
+        left: 19px;
+        padding: 6px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: var(--green);
+        border: 1px solid #28332326;
+        border-radius: 3px;
+        transform: rotate(-5deg);
+      }
+      .open {
+        position: absolute;
+        bottom: 18px;
+        right: 18px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid #fff;
+        border-radius: 50%;
+        background: #ffffffd9;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+      .open svg {
+        width: 21px;
+        height: 21px;
+      }
+      .experiment:hover .thumbnail,
+      .experiment:focus-visible .thumbnail {
+        box-shadow: 0 12px 25px #293e2815;
+        border-color: #7b986b;
+      }
+      .experiment:hover img,
+      .experiment:focus-visible img {
+        transform: scale(1.045);
+      }
+      .experiment:hover .open,
+      .experiment:focus-visible .open {
+        background: var(--green);
+        transform: rotate(-35deg);
+      }
+      .details {
+        padding: 18px 2px 0;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+      }
+      h3 {
+        margin: 0;
+        font:
+          600 23px/1.3 "Space Grotesk",
+          sans-serif;
+      }
+      .number {
+        font:
+          400 12px "Space Grotesk",
+          sans-serif;
+        color: var(--muted);
+      }
+      .description {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 7px 2px 0;
+      }
+      .afterword {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 24px 40px 60px;
+      }
+      .asterisk {
+        font:
+          400 68px/1 "Space Grotesk",
+          sans-serif;
+        color: #b65468;
+        transform: rotate(12deg);
+        margin-bottom: 13px;
+      }
+      .afterword p {
+        font:
+          500 25px/1.45 "Space Grotesk",
+          sans-serif;
+        max-width: 270px;
+        margin: 0;
+      }
+      .afterword small {
+        display: block;
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 15px;
+      }
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        border-top: 1px solid var(--line);
+        padding: 25px 0 33px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      footer a {
+        text-underline-offset: 3px;
+      }
+      .intro,
+      .grid {
+        animation: arrive 0.65s both;
+      }
+      .grid {
+        animation-delay: 0.1s;
+      }
+      @keyframes arrive {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (min-width: 1400px) {
+        .intro {
+          padding-top: 80px;
+        }
+      }
+      @media (max-width: 700px) {
+        .shell {
+          padding: 0 24px;
+        }
+        header {
+          min-height: 78px;
+        }
+        .wordmark {
+          font-size: 16px;
+          gap: 8px;
+        }
+        .back-link {
+          font-size: 12px;
+        }
+        .intro {
+          padding: 46px 0 36px;
+        }
+        h1 {
+          font-size: 52px;
+        }
+        .intro p:last-child {
+          font-size: 16px;
+          max-width: 310px;
+          margin-top: 18px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+          gap: 34px;
+          padding: 24px 0 38px;
+        }
+        .afterword {
+          padding: 0;
+          flex-direction: row;
+          align-items: center;
+          gap: 20px;
+        }
+        .asterisk {
+          font-size: 48px;
+          margin: 0;
+        }
+        .afterword p {
+          font-size: 19px;
+          max-width: none;
+        }
+        .afterword small {
+          font-size: 12px;
+          margin-top: 8px;
+        }
+        h3 {
+          font-size: 21px;
+        }
+        .new {
+          top: 14px;
+          left: 14px;
+        }
+        footer {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+      @media (max-width: 360px) {
+        .shell {
+          padding: 0 18px;
+        }
+        h1 {
+          font-size: 44px;
+        }
+        .back-link span {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        .thumbnail {
+          transform: none !important;
+        }
+      }
+    </style>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="wordmark" href="./" aria-label="Blue Edge Lab home"
+          ><span class="brand-mark" aria-hidden="true">b.</span>blue edge</a
+        >
+        <a
+          class="back-link"
+          href="https://blueedge.me"
+          aria-label="Back to blueedge.me"
+          title="Back to blueedge.me"
+          ><span>Back to blueedge.me</span
+          ><i data-lucide="arrow-up-right" aria-hidden="true"></i
+        ></a>
+      </header>
+      <main>
+        <section aria-labelledby="experiments-title">
+          <div class="catalog-heading">
+            <h2 id="experiments-title">The experiments</h2>
+            <span class="count">001 & counting</span>
+          </div>
+          <div class="grid">
+            <a
+              class="experiment"
+              href="./procedurally-fish-animation/index.html"
+              aria-labelledby="fish-title"
+              aria-describedby="fish-description">
+              <div class="thumbnail">
+                <img
+                  src="./assets/fish-preview.png"
+                  data-preview="./assets/fish-preview.gif"
+                  width="1000"
+                  height="625"
+                  alt="Colorful procedural fish swimming in a pale green pond"
+                  fetchpriority="high" />
+                <span class="new">Fresh from the lab</span>
+                <span class="open" aria-hidden="true"
+                  ><i data-lucide="arrow-right"></i
+                ></span>
+              </div>
+              <div class="details">
+                <h3 id="fish-title">Just keep swimming</h3>
+                <span class="number">001</span>
+              </div>
+              <p class="description" id="fish-description">
+                A tiny school of fish. A world made of rules.
+              </p>
+            </a>
+            <aside class="afterword">
+              <span class="asterisk" aria-hidden="true">*</span>
+              <div>
+                <p>More experiments<br />down the line.</p>
+                <small
+                  ><a href="https://twitter.com/blueedgetechno"
+                    >Follow my Twitter for more.</a
+                  ></small
+                >
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+      <footer>
+        <span
+          >Made out of curiosity by
+          <a href="https://blueedge.me">Blue Edge</a>.</span
+        ><span>Always a work in progress.</span>
+      </footer>
+    </div>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        if (window.lucide) lucide.createIcons()
+        const motion = window.matchMedia("(prefers-reduced-motion: reduce)")
+        for (const card of document.querySelectorAll(".experiment")) {
+          const thumbnail = card.querySelector(".thumbnail")
+          const image = thumbnail.querySelector("img")
+          const still = image.getAttribute("src")
+          let hovered = false
+          let focused = false
+          const updatePreview = () => {
+            const source =
+              !motion.matches && (hovered || focused) && image.dataset.preview
+                ? image.dataset.preview
+                : still
+            if (image.getAttribute("src") !== source) image.src = source
+          }
+          image.addEventListener("error", () => {
+            if (image.getAttribute("src") !== still) {
+              delete image.dataset.preview
+              image.src = still
+            }
+          })
+          card.addEventListener("pointerenter", (event) => {
+            hovered = event.pointerType === "mouse"
+            updatePreview()
+          })
+          card.addEventListener("focus", () => {
+            focused = true
+            updatePreview()
+          })
+          card.addEventListener("blur", () => {
+            focused = false
+            updatePreview()
+          })
+          motion.addEventListener("change", updatePreview)
+          card.addEventListener("pointermove", (event) => {
+            if (motion.matches || event.pointerType !== "mouse") return
+            const bounds = card.getBoundingClientRect()
+            thumbnail.style.setProperty(
+              "--tilt-x",
+              `${(0.5 - (event.clientY - bounds.top) / bounds.height) * 5}deg`,
+            )
+            thumbnail.style.setProperty(
+              "--tilt-y",
+              `${((event.clientX - bounds.left) / bounds.width - 0.5) * 5}deg`,
+            )
+          })
+          card.addEventListener("pointerleave", () => {
+            hovered = false
+            updatePreview()
+            thumbnail.style.removeProperty("--tilt-x")
+            thumbnail.style.removeProperty("--tilt-y")
+          })
+        }
+      })
+    </script>
+  </body>
+</html>
