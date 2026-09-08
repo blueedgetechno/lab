@@ -4,6 +4,8 @@ Small interactive experiments by [Blue Edge](https://blueedge.me).
 
 Site: [lab.blueedge.me](https://lab.blueedge.me/)
 
+[![Colorful procedural fish swimming in a pale green pond](assets/fish-preview.png)](https://lab.blueedge.me/procedurally-fish-animation/)
+
 ## Run Locally
 
 Open [index.html](index.html) in a modern browser to view the lab, or open
