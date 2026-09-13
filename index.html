@@ -117,6 +117,14 @@
         border-radius: 7px;
         font-size: 22px;
       }
+      .header-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px 20px;
+        min-width: 0;
+      }
       .back-link {
         display: inline-flex;
         align-items: center;
@@ -448,14 +456,19 @@
         <a class="wordmark" href="./" aria-label="Blue Edge Lab home"
           ><span class="brand-mark" aria-hidden="true">b.</span>blue edge</a
         >
-        <a
-          class="back-link"
-          href="https://blueedge.me"
-          aria-label="Back to blueedge.me"
-          title="Back to blueedge.me"
-          ><span>Back to blueedge.me</span
-          ><i data-lucide="arrow-up-right" aria-hidden="true"></i
-        ></a>
+        <nav class="header-links" aria-label="Personal links">
+          <a class="back-link" href="https://resume.blueedge.me/"
+            >Resume<i data-lucide="arrow-up-right" aria-hidden="true"></i
+          ></a>
+          <a
+            class="back-link"
+            href="https://blueedge.me"
+            aria-label="Back to blueedge.me"
+            title="Back to blueedge.me"
+            ><span>Back to blueedge.me</span
+            ><i data-lucide="arrow-up-right" aria-hidden="true"></i
+          ></a>
+        </nav>
       </header>
       <main>
         <section aria-labelledby="experiments-title">

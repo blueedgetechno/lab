@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="three-loading">
   <head>
     <meta charset="UTF-8" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -9,6 +9,10 @@
       name="description"
       content="An old-school television with a little internet inside. Tune into a random selection of YouTube films." />
     <title>Analog | Vintage TV</title>
+    <style>
+      .three-loading .tv-stage { visibility: hidden; }
+    </style>
+    <link rel="stylesheet" href="./tv3d.css" />
     <link rel="icon" href="../assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1068,7 +1072,6 @@
         </p>
       </main>
     </div>
-    <link rel="stylesheet" href="./tv3d.css" />
     <script type="importmap">
       { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
     </script>
@@ -1386,6 +1389,7 @@
       window.analogTV = {
         getState: () => ({ powered, muted, ready, current, playing: document.body.classList.contains("playing") }),
         mountPlayer: () => {
+          document.documentElement.classList.remove("three-loading")
           displayReady = true
           if (powered && channels.length) requestPlayer()
         },
