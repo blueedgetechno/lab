@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e9ece8" />
+    <meta
+      name="description"
+      content="An old-school television with a little internet inside. Tune into a random selection of YouTube films." />
+    <title>Analog | Vintage TV</title>
+    <link rel="icon" href="../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <style>
+      :root {
+        --paper: #e9ece8;
+        --ink: #283b35;
+        --muted: #6e7c74;
+        --accent: #c44b39;
+        --mint: #a5bdb0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: 0;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image: radial-gradient(#4e695521 0.65px, transparent 0.65px);
+        background-size: 5px 5px;
+        pointer-events: none;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button,
+      a,
+      input {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button {
+        cursor: pointer;
+        color: inherit;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 5px;
+      }
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 1.7;
+        flex-shrink: 0;
+      }
+      .page {
+        max-width: 1440px;
+        min-height: 100svh;
+        margin: auto;
+        padding: 0 52px;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        min-height: 102px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        border-bottom: 1px solid #283b3526;
+      }
+      .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        font-size: 30px;
+        font-weight: 700;
+      }
+      .wordmark svg {
+        width: 27px;
+        height: 27px;
+      }
+      .mono {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        line-height: 1.6;
+      }
+      .header-caption {
+        padding-left: 22px;
+        margin-left: 12px;
+        border-left: 1px solid #283b3540;
+        color: var(--muted);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+      }
+      .back {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 12px;
+      }
+      .back:hover {
+        color: var(--accent);
+      }
+      main {
+        flex: 1;
+        padding: 35px 0 38px;
+      }
+      .intro {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 500;
+      }
+      .edition {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--muted);
+      }
+      .edition::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+      }
+      .tv-stage {
+        max-width: 960px;
+        margin: 0 auto;
+        padding-top: 78px;
+        position: relative;
+      }
+      .antenna {
+        width: 150px;
+        height: 74px;
+        position: absolute;
+        top: 9px;
+        right: 180px;
+      }
+      .antenna::before,
+      .antenna::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 72px;
+        width: 5px;
+        height: 85px;
+        border-radius: 5px;
+        background: linear-gradient(90deg, #6b756d, #fafcf8 50%, #8a958c);
+        transform-origin: bottom;
+        transform: rotate(-48deg);
+        box-shadow: 1px 0 1px #50605550;
+      }
+      .antenna::after {
+        height: 76px;
+        transform: rotate(47deg);
+      }
+      .antenna-base {
+        position: absolute;
+        bottom: -3px;
+        left: 48px;
+        width: 55px;
+        height: 15px;
+        border-radius: 50% 50% 0 0;
+        background: #4c5c51;
+        box-shadow: inset 0 3px 2px #ffffff30;
+      }
+      .television {
+        position: relative;
+        border-radius: 34px;
+        padding: 23px;
+        background: linear-gradient(145deg, #b7cbbd, #94ad9e 65%, #819a8c);
+        border: 2px solid #627f6e;
+        box-shadow:
+          inset 0 2px 2px #eef7dd,
+          inset 0 -5px 3px #52695170,
+          0 7px 0 #566d5e,
+          0 10px 0 #405346,
+          0 24px 32px -18px #24372b80;
+      }
+      .tv-face {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 158px;
+        gap: 24px;
+      }
+      .screen-frame {
+        min-width: 0;
+        padding: 17px;
+        border-radius: 48px;
+        background: linear-gradient(140deg, #465049, #27322c 60%, #58645b);
+        box-shadow:
+          0 2px 1px #d7e2d080,
+          inset 0 3px 7px #18271d90;
+      }
+      .screen {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        width: 100%;
+        min-height: 200px;
+        aspect-ratio: 4 / 3;
+        background: #141a18;
+        border-radius: 35px;
+        box-shadow:
+          0 0 0 3px #15221b,
+          inset 0 0 22px #000;
+      }
+      .screen::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        border-radius: inherit;
+        pointer-events: none;
+        box-shadow: inset 0 0 26px 9px #0008;
+      }
+      .picture {
+        position: absolute;
+        inset: 0;
+        background: #111;
+        display: grid;
+        place-items: center;
+      }
+      #player {
+        width: 100%;
+        height: 100%;
+      }
+      .idle {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #e1e8d2;
+        background: radial-gradient(ellipse at center, #303e35, #17231e);
+        transition: opacity 0.3s;
+      }
+      .idle[hidden] {
+        display: none;
+      }
+      .station-icon {
+        width: 68px;
+        height: 68px;
+        margin-bottom: 15px;
+        opacity: 0.65;
+      }
+      .station-name {
+        font-size: 47px;
+        font-weight: 600;
+        line-height: 1;
+        text-shadow:
+          2px 0 #b2eac550,
+          -2px 0 #e5b7b340;
+      }
+      .station-subtitle {
+        margin-top: 12px;
+        opacity: 0.45;
+      }
+      .start {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        margin-top: 27px;
+        border: 1px solid #d8e2ce60;
+        border-radius: 50%;
+        background: #ceddc90d;
+        color: #e4ecda;
+        transition: background 0.2s;
+      }
+      .start:hover {
+        background: #ceddc928;
+      }
+      .screen-message {
+        margin-top: 18px;
+        text-align: center;
+        font-size: 10px;
+        color: #bec9b6;
+      }
+      .scanlines {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        background: repeating-linear-gradient(0deg, #0000 0 2px, #0002 2px 3px);
+        pointer-events: none;
+        opacity: 0.55;
+      }
+      .scanlines.disabled {
+        display: none;
+      }
+      .noise {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 4;
+        pointer-events: none;
+        opacity: 0;
+        image-rendering: pixelated;
+      }
+      .noise.active {
+        opacity: 0.8;
+      }
+      .channel-osd {
+        position: absolute;
+        top: 24px;
+        left: 25px;
+        z-index: 6;
+        color: #c6eea4;
+        font:
+          23px "DM Mono",
+          monospace;
+        text-shadow: 1px 2px 3px #000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s;
+      }
+      .channel-osd.visible {
+        opacity: 1;
+      }
+      .controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 0 0;
+        min-width: 0;
+      }
+      .model {
+        text-align: center;
+        font-size: 15px;
+        font-weight: 700;
+        font-style: italic;
+      }
+      .model small {
+        display: block;
+        margin-top: 2px;
+        font-size: 8px;
+        font-weight: 400;
+        font-style: normal;
+        opacity: 0.65;
+      }
+      .dial-label {
+        margin-top: 21px;
+        font-size: 9px;
+      }
+      .dial-ring {
+        position: relative;
+        margin: 7px 0 8px;
+        width: 104px;
+        height: 104px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #344c4060;
+        border-radius: 50%;
+        background: repeating-conic-gradient(
+          from -3deg,
+          #344c4080 0deg 1deg,
+          transparent 1deg 30deg
+        );
+      }
+      .dial {
+        width: 86px;
+        height: 86px;
+        border: 3px solid #556356;
+        border-radius: 50%;
+        background: linear-gradient(130deg, #e2e2d4, #a5ada0 60%, #939e90);
+        box-shadow:
+          inset 1px 2px 2px #fff9,
+          2px 5px 5px #30423280;
+        display: grid;
+        place-items: center;
+        position: relative;
+        transition: transform 0.25s;
+      }
+      .dial::before {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 53px;
+        background: linear-gradient(90deg, #697365, #e0e1d1 40%, #b7bdae);
+        border-radius: 3px;
+        box-shadow: 2px 2px 2px #4c5b4c80;
+      }
+      .dial::after {
+        content: "";
+        position: absolute;
+        width: 3px;
+        height: 9px;
+        top: 7px;
+        background: var(--accent);
+      }
+      .channel-readout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+      }
+      .channel-readout output {
+        font:
+          17px "DM Mono",
+          monospace;
+        background: #2d3d33;
+        color: #d8e3c5;
+        padding: 2px 9px;
+        border-radius: 3px;
+        box-shadow: inset 0 2px 3px #0006;
+      }
+      .small-button {
+        border: 0;
+        background: transparent;
+        padding: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .small-button:hover {
+        color: var(--accent);
+      }
+      .small-button svg {
+        width: 15px;
+        height: 15px;
+      }
+      .volume {
+        width: 100%;
+        margin-top: 18px;
+      }
+      .volume-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 3px;
+      }
+      input[type="range"] {
+        width: 100%;
+        height: 20px;
+        accent-color: #3b5141;
+        cursor: pointer;
+      }
+      .speaker {
+        width: 100%;
+        min-height: 44px;
+        flex: 1;
+        margin: 13px 0 18px;
+        background: repeating-linear-gradient(
+          0deg,
+          #344c4070 0 2px,
+          #c3d0bb80 2px 4px,
+          transparent 4px 7px
+        );
+        border-radius: 5px;
+        opacity: 0.75;
+      }
+      .power-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .power {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(145deg, #d77457, #a93628);
+        border: 2px solid #7e4030;
+        color: #ffe6d5;
+        box-shadow:
+          inset 0 1px 2px #fff7,
+          0 3px 3px #33423260;
+      }
+      .power:active {
+        transform: translateY(2px);
+        box-shadow: inset 0 2px 4px #733628;
+      }
+      .power-led {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #586654;
+        margin-right: 5px;
+      }
+      .powered .power-led {
+        background: #edaa67;
+        box-shadow: 0 0 6px #edaa67;
+      }
+      .tv-bottom {
+        display: flex;
+        justify-content: space-between;
+        margin: 15px 11px -3px;
+        font-size: 8px;
+        color: #3c5546;
+      }
+      .feet {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 78px 0;
+      }
+      .feet span {
+        display: block;
+        width: 48px;
+        height: 23px;
+        background: linear-gradient(90deg, #394c3e, #687d69, #394c3e);
+        clip-path: polygon(0 0, 100% 0, 85% 100%, 12% 100%);
+      }
+      .stage-shadow {
+        height: 14px;
+        width: 91%;
+        margin: -9px auto 0;
+        border-radius: 50%;
+        background: #293e3130;
+        filter: blur(8px);
+      }
+      .now-playing {
+        max-width: 918px;
+        margin: 25px auto 0;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .program {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 0;
+      }
+      .album {
+        width: 64px;
+        height: 48px;
+        object-fit: cover;
+        filter: saturate(0.65);
+        border-radius: 3px;
+        background: #83978b;
+      }
+      .program-copy {
+        min-width: 0;
+      }
+      .program-kicker {
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .live-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #859187;
+      }
+      .playing .live-dot {
+        background: var(--accent);
+      }
+      .program-title {
+        margin: 3px 0;
+        font-size: 16px;
+        font-weight: 500;
+        overflow-wrap: anywhere;
+      }
+      .program-meta {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .shuffle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 17px;
+        border: 1px solid #8b9c8f;
+        border-radius: 4px;
+        background: transparent;
+        font-size: 12px;
+        box-shadow: 0 2px 0 #283b3510;
+      }
+      .shuffle:hover {
+        background: #dbe2d9;
+      }
+      .shuffle svg {
+        width: 16px;
+        height: 16px;
+      }
+      .under-controls {
+        max-width: 918px;
+        margin: 22px auto 0;
+        padding-top: 15px;
+        border-top: 1px solid #283b3526;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+      }
+      .status {
+        margin: 0;
+        color: var(--muted);
+        text-transform: none;
+        font-size: 11px;
+      }
+      .utility-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-shrink: 0;
+      }
+      .effect-toggle {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 10px;
+      }
+      .effect-toggle input {
+        accent-color: #47624d;
+        margin: 0;
+      }
+      .youtube-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+      }
+      .youtube-link svg {
+        width: 13px;
+        height: 13px;
+      }
+      footer {
+        min-height: 65px;
+        border-top: 1px solid #283b3526;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        color: var(--muted);
+      }
+      footer .footer-note {
+        text-transform: none;
+      }
+      @media (min-width: 1400px) {
+        main {
+          padding-top: 45px;
+        }
+        .tv-stage {
+          margin-top: 12px;
+        }
+      }
+      @media (max-width: 760px) {
+        .page {
+          padding: 0 22px;
+        }
+        header {
+          min-height: 80px;
+        }
+        .header-caption {
+          display: none;
+        }
+        main {
+          padding-top: 26px;
+        }
+        h1 {
+          font-size: 20px;
+        }
+        .edition {
+          font-size: 8px;
+        }
+        .tv-stage {
+          padding-top: 66px;
+        }
+        .antenna {
+          right: 80px;
+          top: 0;
+          transform: scale(0.85);
+          transform-origin: bottom;
+        }
+        .television {
+          padding: 15px;
+          border-radius: 25px;
+        }
+        .tv-face {
+          gap: 14px;
+          grid-template-columns: minmax(0, 1fr) 108px;
+        }
+        .screen-frame {
+          padding: 11px;
+          border-radius: 32px;
+        }
+        .screen {
+          border-radius: 22px;
+        }
+        .controls {
+          padding-top: 3px;
+        }
+        .model {
+          font-size: 12px;
+        }
+        .model small {
+          font-size: 7px;
+        }
+        .dial-label {
+          margin-top: 12px;
+        }
+        .dial-ring {
+          width: 76px;
+          height: 76px;
+        }
+        .dial {
+          width: 63px;
+          height: 63px;
+        }
+        .dial::before {
+          height: 37px;
+        }
+        .channel-readout {
+          gap: 4px;
+        }
+        .volume {
+          margin-top: 8px;
+        }
+        .speaker {
+          min-height: 22px;
+          margin: 8px 0;
+        }
+        .power {
+          width: 34px;
+          height: 34px;
+        }
+        .power-row {
+          gap: 6px;
+        }
+        .station-name {
+          font-size: 32px;
+        }
+        .station-icon {
+          display: none;
+        }
+        .start {
+          margin-top: 16px;
+          width: 43px;
+          height: 43px;
+          flex-shrink: 0;
+        }
+        .station-subtitle {
+          font-size: 8px;
+        }
+        .screen-message {
+          margin-top: 12px;
+          font-size: 8px;
+        }
+      }
+      @media (max-width: 540px) {
+        .page {
+          padding: 0 16px;
+        }
+        .wordmark {
+          font-size: 26px;
+        }
+        .back {
+          font-size: 11px;
+        }
+        .intro {
+          align-items: baseline;
+        }
+        .edition {
+          font-size: 7px;
+          gap: 5px;
+        }
+        .television {
+          padding: 13px;
+          border-radius: 24px;
+        }
+        .tv-face {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+        .screen-frame {
+          padding: 12px;
+        }
+        .screen {
+          aspect-ratio: 4 / 3;
+        }
+        .controls {
+          display: grid;
+          grid-template-columns: 72px minmax(0, 1fr) 53px;
+          column-gap: 17px;
+          align-items: center;
+        }
+        .model,
+        .dial-label,
+        .speaker,
+        .channel-readout {
+          display: none;
+        }
+        .dial-ring {
+          width: 66px;
+          height: 66px;
+          margin: 0;
+        }
+        .dial {
+          width: 55px;
+          height: 55px;
+        }
+        .dial::before {
+          height: 31px;
+        }
+        .volume {
+          margin: 0;
+        }
+        .volume-heading {
+          font-size: 8px;
+        }
+        .power-row {
+          flex-direction: column;
+          gap: 4px;
+        }
+        .power-row .mono {
+          font-size: 7px;
+        }
+        .power {
+          width: 36px;
+          height: 36px;
+        }
+        .tv-bottom {
+          margin: 12px 5px -2px;
+          font-size: 6px;
+        }
+        .station-name {
+          font-size: 42px;
+        }
+        .station-icon {
+          width: 48px;
+          height: 48px;
+        }
+        .station-subtitle {
+          font-size: 9px;
+        }
+        .screen-message {
+          font-size: 9px;
+        }
+        .feet {
+          padding-left: 46px;
+          padding-right: 46px;
+        }
+        .feet span {
+          height: 19px;
+          width: 34px;
+        }
+        .now-playing {
+          margin-top: 24px;
+          gap: 10px;
+        }
+        .program {
+          gap: 10px;
+        }
+        .album {
+          width: 45px;
+          height: 42px;
+        }
+        .program-title {
+          font-size: 13px;
+        }
+        .program-kicker {
+          font-size: 8px;
+        }
+        .program-meta {
+          font-size: 9px;
+        }
+        .shuffle {
+          padding: 12px;
+        }
+        .shuffle span {
+          display: none;
+        }
+        .under-controls {
+          align-items: flex-start;
+        }
+        .status {
+          max-width: 180px;
+          font-size: 9px;
+        }
+        .utility-controls {
+          gap: 12px;
+        }
+        .youtube-link span {
+          display: none;
+        }
+        footer {
+          font-size: 8px !important;
+          min-height: 60px;
+        }
+        footer .footer-note {
+          max-width: 160px;
+          text-align: right;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="brand">
+          <a class="wordmark" href="./" aria-label="Analog home"
+            ><i data-lucide="tv-minimal"></i>analog.</a
+          ><span class="header-caption mono"
+            >Internet television.<br />An old soul.</span
+          >
+        </div>
+        <a class="back" href="../"
+          ><i data-lucide="arrow-up-left"></i>Back to the lab</a
+        >
+      </header>
+      <main>
+        <div class="tv-stage">
+          <div class="antenna" aria-hidden="true">
+            <div class="antenna-base"></div>
+          </div>
+          <section class="television" aria-label="Vintage television">
+            <div class="tv-face">
+              <div class="screen-frame">
+                <div class="screen">
+                  <div class="picture"><div id="player"></div></div>
+                  <div class="idle" id="idle">
+                    <i class="station-icon" data-lucide="radio-tower"></i>
+                    <div class="station-name">analog.</div>
+                    <div class="station-subtitle mono">
+                      Something good is on.
+                    </div>
+                    <button
+                      class="start"
+                      id="start"
+                      aria-label="Turn on television"
+                      title="Turn on television">
+                      <i data-lucide="power"></i>
+                    </button>
+                    <div class="screen-message mono" id="screen-message">
+                      Standing by
+                    </div>
+                  </div>
+                  <div class="scanlines" id="scanlines"></div>
+                  <canvas
+                    class="noise"
+                    id="noise"
+                    width="160"
+                    height="120"
+                    aria-hidden="true"></canvas>
+                  <div class="channel-osd" id="channel-osd" aria-hidden="true">
+                    CH 01
+                  </div>
+                </div>
+              </div>
+              <div class="controls">
+                <div class="model">
+                  analog<small class="mono">Solid state / A-01</small>
+                </div>
+                <div class="dial-label mono">UHF / Channel</div>
+                <div class="dial-ring">
+                  <button
+                    class="dial"
+                    id="dial"
+                    title="Tune to a random channel"
+                    aria-label="Tune to a random channel"></button>
+                </div>
+                <div class="channel-readout">
+                  <button
+                    class="small-button"
+                    id="previous"
+                    aria-label="Previous channel"
+                    title="Previous channel">
+                    <i data-lucide="chevron-left"></i></button
+                  ><output id="channel-number" aria-label="Channel">01</output
+                  ><button
+                    class="small-button"
+                    id="next"
+                    aria-label="Next channel"
+                    title="Next channel">
+                    <i data-lucide="chevron-right"></i>
+                  </button>
+                </div>
+                <div class="volume">
+                  <div class="volume-heading mono">
+                    <label for="volume">Volume</label
+                    ><button
+                      class="small-button"
+                      id="mute"
+                      aria-label="Mute"
+                      title="Mute"
+                      aria-pressed="false">
+                      <i data-lucide="volume-2"></i>
+                    </button>
+                  </div>
+                  <input
+                    type="range"
+                    id="volume"
+                    min="0"
+                    max="100"
+                    value="50"
+                    aria-label="Volume" />
+                </div>
+                <div class="speaker" aria-hidden="true"></div>
+                <div class="power-row">
+                  <button
+                    class="power"
+                    id="power"
+                    aria-label="Turn on television"
+                    aria-pressed="false"
+                    title="Turn on television">
+                    <i data-lucide="power"></i></button
+                  ><span class="mono"
+                    ><span class="power-led"></span>Power</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="tv-bottom mono">
+              <span>Precision vision &nbsp; / &nbsp; High fidelity sound</span
+              ><span>Made for slower days.</span>
+            </div>
+          </section>
+          <div class="feet" aria-hidden="true"><span></span><span></span></div>
+          <div class="stage-shadow" aria-hidden="true"></div>
+        </div>
+        <p id="status" role="status" aria-live="polite"
+          style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;">
+          Off air. The evening is yours.
+        </p>
+      </main>
+    </div>
+    <script>
+      let channels = []
+      const element = (id) => document.getElementById(id)
+      let current = 0
+      let player
+      let ready = false
+      let powered = false
+      let muted = false
+      let apiRequested = false
+      let apiTimer
+      let osdTimer
+      let noiseTimer
+      let dialRotation = 0
+      let remaining = []
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      )
+      const noiseCanvas = element("noise")
+      const noiseContext = noiseCanvas.getContext("2d")
+
+      function renderIcons() {
+        window.lucide?.createIcons()
+      }
+
+      function updateProgram() {
+        const number = String(current + 1).padStart(2, "0")
+        element("channel-number").textContent = number
+        element("channel-osd").textContent = `CH ${number}`
+      }
+
+      function showIdle(message) {
+        element("idle").hidden = false
+        element("screen-message").textContent = message
+      }
+
+      function staticTransition() {
+        clearTimeout(noiseTimer)
+        if (!reducedMotion.matches && noiseContext) {
+          const image = noiseContext.createImageData(160, 120)
+          for (let offset = 0; offset < image.data.length; offset += 4) {
+            const shade = Math.random() * 255
+            image.data[offset] = shade
+            image.data[offset + 1] = shade
+            image.data[offset + 2] = shade
+            image.data[offset + 3] = 255
+          }
+          noiseContext.putImageData(image, 0, 0)
+          noiseCanvas.classList.add("active")
+          noiseTimer = setTimeout(
+            () => noiseCanvas.classList.remove("active"),
+            230,
+          )
+        }
+        clearTimeout(osdTimer)
+        element("channel-osd").classList.add("visible")
+        osdTimer = setTimeout(
+          () => element("channel-osd").classList.remove("visible"),
+          2400,
+        )
+      }
+
+      function syncVolume() {
+        if (ready) {
+          player.setVolume(Number(element("volume").value))
+          if (muted) player.mute()
+          else player.unMute()
+        }
+        const silent = muted || Number(element("volume").value) === 0
+        element("mute").innerHTML =
+          `<i data-lucide="${silent ? "volume-x" : "volume-2"}"></i>`
+        element("mute").setAttribute("aria-pressed", String(silent))
+        element("mute").setAttribute("aria-label", silent ? "Unmute" : "Mute")
+        element("mute").title = silent ? "Unmute" : "Mute"
+        renderIcons()
+      }
+
+      function playbackError(code) {
+        document.body.classList.remove("playing")
+        element("idle").hidden = true
+        element("status").textContent =
+          code === 153
+            ? "YouTube needs an HTTP origin. Open this page through a local server."
+            : "This channel is unavailable. Try another, or watch on YouTube."
+      }
+
+      function loadChannel() {
+        if (!ready || !powered) return
+        element("idle").hidden = true
+        document.body.classList.remove("playing")
+        element("status").textContent = "Tuning in..."
+        staticTransition()
+        player.loadVideoById(channels[current].id)
+        syncVolume()
+      }
+
+      function initializePlayer() {
+        if (player) return
+        const playerVars = { autoplay: 0, playsinline: 1, rel: 0, controls: 1 }
+        if (location.protocol !== "file:") playerVars.origin = location.origin
+        player = new YT.Player("player", {
+          width: "100%",
+          height: "100%",
+          videoId: channels[current].id,
+          playerVars,
+          events: {
+            onReady: () => {
+              clearTimeout(apiTimer)
+              ready = true
+              const iframe = player.getIframe()
+              iframe.title = "YouTube television player"
+              iframe.setAttribute(
+                "referrerpolicy",
+                "strict-origin-when-cross-origin",
+              )
+              syncVolume()
+              if (powered) loadChannel()
+            },
+            onStateChange: (event) => {
+              if (!powered) {
+                if (event.data === YT.PlayerState.PLAYING) player.pauseVideo()
+                return
+              }
+              if (event.data === YT.PlayerState.ENDED) randomChannel()
+              else if (event.data === YT.PlayerState.PLAYING) {
+                document.body.classList.add("playing")
+                element("status").textContent = "On air. Stay a while."
+              } else if (event.data === YT.PlayerState.PAUSED) {
+                document.body.classList.remove("playing")
+                element("status").textContent = "Broadcast paused."
+              } else if (event.data === YT.PlayerState.BUFFERING) {
+                element("status").textContent = "Receiving signal..."
+              }
+            },
+            onAutoplayBlocked: () => {
+              if (powered) {
+                player.cueVideoById(channels[current].id)
+                element("status").textContent =
+                  "Press play on the screen to start the broadcast."
+              }
+            },
+            onError: (event) => {
+              if (powered) playbackError(event.data)
+            },
+          },
+        })
+      }
+
+      function requestPlayer() {
+        if (window.YT?.Player) {
+          initializePlayer()
+          return
+        }
+        if (apiRequested) return
+        apiRequested = true
+        const script = document.createElement("script")
+        script.src = "https://www.youtube.com/iframe_api"
+        script.onerror = () => {
+          clearTimeout(apiTimer)
+          apiRequested = false
+          script.remove()
+          if (powered) {
+            showIdle("Signal lost")
+            element("status").textContent =
+              "YouTube could not connect. Press the screen power button to retry."
+          }
+        }
+        document.head.append(script)
+        apiTimer = setTimeout(() => {
+          if (!ready && powered) {
+            showIdle("No signal")
+            element("status").textContent =
+              "YouTube is taking too long. Try another channel or open YouTube."
+          }
+        }, 15000)
+      }
+
+      window.onYouTubeIframeAPIReady = initializePlayer
+
+      function setPower(value) {
+        powered = value
+        document
+          .querySelector(".television")
+          .classList.toggle("powered", powered)
+        element("power").setAttribute("aria-pressed", String(powered))
+        element("power").setAttribute(
+          "aria-label",
+          powered ? "Turn off television" : "Turn on television",
+        )
+        element("power").title = powered
+          ? "Turn off television"
+          : "Turn on television"
+        updateProgram()
+        if (powered) {
+          showIdle("Finding a signal...")
+          element("status").textContent = "Connecting to YouTube..."
+          if (ready) loadChannel()
+          else requestPlayer()
+        } else {
+          if (ready) player.pauseVideo()
+          document.body.classList.remove("playing")
+          noiseCanvas.classList.remove("active")
+          element("channel-osd").classList.remove("visible")
+          showIdle("Standing by")
+          element("status").textContent = "Off air. The evening is yours."
+        }
+      }
+
+      function tune(index) {
+        current = (index + channels.length) % channels.length
+        remaining = remaining.filter((channel) => channel !== current)
+        dialRotation += 30
+        element("dial").style.transform = `rotate(${dialRotation}deg)`
+        updateProgram()
+        if (!powered) setPower(true)
+        else if (ready) loadChannel()
+        else requestPlayer()
+      }
+
+      function randomChannel() {
+        if (channels.length === 1) {
+          tune(0)
+          return
+        }
+        if (!remaining.length)
+          remaining = channels
+            .map((channel, index) => index)
+            .filter((index) => index !== current)
+        const position = Math.floor(Math.random() * remaining.length)
+        tune(remaining.splice(position, 1)[0])
+      }
+
+      element("power").addEventListener("click", () => setPower(!powered))
+      element("start").addEventListener("click", () => setPower(true))
+      element("dial").addEventListener("click", randomChannel)
+      element("previous").addEventListener("click", () => tune(current - 1))
+      element("next").addEventListener("click", () => tune(current + 1))
+      element("volume").addEventListener("input", () => {
+        muted = false
+        syncVolume()
+      })
+      element("mute").addEventListener("click", () => {
+        if (Number(element("volume").value) === 0) {
+          element("volume").value = 50
+          muted = false
+        } else muted = !muted
+        syncVolume()
+      })
+      async function loadChannels() {
+        const controls = ["power", "start", "dial", "previous", "next"]
+        controls.forEach((id) => { element(id).disabled = true })
+        element("status").textContent = "Loading channels..."
+        showIdle("Loading channels...")
+        try {
+          const response = await fetch("./channels.json")
+          if (!response.ok) throw new Error("Channel list unavailable")
+          const data = await response.json()
+          const fields = ["id", "title", "creator", "category", "year"]
+          if (!Array.isArray(data) || !data.length || data.some((channel) =>
+            !channel || fields.some((field) =>
+              typeof channel[field] !== "string" || !channel[field].trim()
+            ) || !/^[A-Za-z0-9_-]{11}$/.test(channel.id)
+          )) throw new Error("Invalid channel list")
+          channels = data
+          current = Math.floor(Math.random() * channels.length)
+          updateProgram()
+          controls.forEach((id) => { element(id).disabled = false })
+          showIdle("Standing by")
+          element("status").textContent = "Off air. The evening is yours."
+        } catch {
+          showIdle("No channels available")
+          element("status").textContent = location.protocol === "file:"
+            ? "Open this page through a local server to load channels.json."
+            : "Could not load channels.json. Check the file and reload."
+        }
+      }
+
+      loadChannels()
+      renderIcons()
+    </script>
+  </body>
+</html>
