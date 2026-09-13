@@ -1,0 +1,44 @@
+body.three-ready {
+  background: #e4e9e8;
+  overflow: hidden;
+}
+.three-ready .shell { max-width: none; padding: 0; }
+.three-ready header { position: absolute; inset: 0 0 auto; z-index: 10; margin: 0; padding: 16px 28px; height: 76px; min-height: 0; pointer-events: none; }
+.three-ready header a { pointer-events: auto; }
+.three-ready .tv-stage { display: none; }
+.scene-viewport { position: fixed; inset: 0; background: radial-gradient(ellipse at 50% 45%, #f4f6f1, #c5d3d3); overflow: hidden; }
+.scene-viewport > div, .scene-viewport > canvas { position: absolute; inset: 0; }
+.scene-viewport > canvas { z-index: 2; touch-action: none; outline: none; cursor: grab; }
+.scene-viewport > canvas:active { cursor: grabbing; }
+.screen.three-screen { width: 960px; height: 660px; position: relative; border-radius: 35px; overflow: hidden; background: #111b18; pointer-events: none; border: none; box-shadow: none; }
+.three-screen .picture { inset: 0; }
+.three-screen .idle { border-radius: 0; }
+.three-screen .station-name { font-size: 80px; }
+.three-screen .station-icon { width: 90px; height: 90px; }
+.three-screen .screen-message { font-size: 24px; }
+.three-screen .noise { width: 100%; height: 100%; }
+.scene-toolbar { position: fixed; z-index: 12; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; max-width: calc(100% - 24px); padding: 10px 14px; background: #f5f7f2ed; border: 1px solid #aab7b3; border-radius: 8px; box-shadow: 0 8px 24px #172b2414; }
+.scene-toolbar .controls { display: contents; }
+.scene-toolbar .model, .scene-toolbar .dial-label, .scene-toolbar .dial-ring, .scene-toolbar .speaker, .scene-toolbar .power-row > span { display: none; }
+.scene-toolbar .channel-readout, .scene-toolbar .volume, .scene-toolbar .power-row { margin: 0; padding: 0; width: auto; border: 0; background: none; }
+.scene-toolbar .channel-readout { display: flex; gap: 8px; }
+.scene-toolbar .channel-readout output { width: 32px; font-size: 16px; }
+.scene-toolbar .volume { display: flex; gap: 8px; align-items: center; }
+.scene-toolbar .volume-heading { margin: 0; }
+.scene-toolbar .volume label { display: none; }
+.scene-toolbar input[type="range"] { width: 82px; margin: 0; }
+.scene-toolbar button, .scene-toolbar .power, .scene-toolbar .small-button { display: grid; place-items: center; width: 36px; height: 36px; min-width: 36px; border: 1px solid #b4c0b8; border-radius: 5px; color: #243b33; background: #e7ece4; box-shadow: 0 2px 0 #a0ada5; cursor: pointer; padding: 6px; }
+.scene-toolbar button:hover { background: #d0e0d5; }
+.scene-toolbar button:active { transform: translateY(2px); box-shadow: none; }
+.scene-toolbar button:focus-visible { outline: 2px solid #187f80; outline-offset: 3px; }
+.scene-toolbar button[aria-pressed="true"] { background: #bed7c9; }
+.scene-toolbar button:disabled { opacity: 0.4; cursor: wait; }
+.scene-toolbar svg { width: 20px; height: 20px; }
+.scene-tooltip { position: fixed; z-index: 15; padding: 6px 9px; border-radius: 4px; background: #20392f; color: white; font: 12px "DM Mono", monospace; pointer-events: none; }
+@media (max-width: 600px) {
+  .three-ready header { padding: 12px 16px; }
+  .three-ready header .header-caption { display: none; }
+  .scene-toolbar { bottom: 12px; flex-wrap: wrap; justify-content: center; width: 340px; gap: 7px; padding: 9px; }
+  .scene-toolbar input[type="range"] { width: 58px; }
+  .scene-toolbar button, .scene-toolbar .small-button, .scene-toolbar .power { width: 32px; height: 32px; min-width: 32px; }
+}

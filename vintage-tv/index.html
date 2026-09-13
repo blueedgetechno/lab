@@ -1068,18 +1068,24 @@
         </p>
       </main>
     </div>
+    <link rel="stylesheet" href="./tv3d.css" />
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+    </script>
     <script>
       let channels = []
       const element = (id) => document.getElementById(id)
       let current = 0
       let player
       let ready = false
+      let displayReady = false
       let powered = false
       let muted = true
       let apiRequested = false
       let apiTimer
       let osdTimer
       let noiseTimer
+      let channelTimer
       let dialRotation = 0
       let remaining = []
       const reducedMotion = window.matchMedia(
@@ -1159,9 +1165,15 @@
         document.body.classList.remove("playing")
         element("status").textContent = "Tuning in..."
         staticTransition()
+        window.dispatchEvent(new Event("tv:tune"))
         syncVolume()
-        player.loadVideoById(channels[current].id)
-        player.playVideo()
+        clearTimeout(channelTimer)
+        const channelId = channels[current].id
+        channelTimer = setTimeout(() => {
+          if (!powered) return
+          player.loadVideoById(channelId)
+          player.playVideo()
+        }, reducedMotion.matches ? 0 : 360)
       }
 
       function initializePlayer() {
@@ -1171,6 +1183,7 @@
         player = new YT.Player("player", {
           width: "100%",
           height: "100%",
+          videoId: channels[current].id,
           playerVars,
           events: {
             onReady: () => {
@@ -1218,6 +1231,7 @@
       }
 
       function requestPlayer() {
+        if (!displayReady) return
         if (window.YT?.Player) {
           initializePlayer()
           return
@@ -1268,6 +1282,7 @@
           if (ready) loadChannel()
           else requestPlayer()
         } else {
+          clearTimeout(channelTimer)
           if (ready) player.pauseVideo()
           document.body.classList.remove("playing")
           noiseCanvas.classList.remove("active")
@@ -1368,6 +1383,14 @@
 
       loadChannels()
       renderIcons()
+      window.analogTV = {
+        getState: () => ({ powered, muted, ready, current, playing: document.body.classList.contains("playing") }),
+        mountPlayer: () => {
+          displayReady = true
+          if (powered && channels.length) requestPlayer()
+        },
+      }
     </script>
+    <script type="module" src="./tv3d.js" onerror="window.analogTV.mountPlayer()"></script>
   </body>
 </html>
