@@ -57,6 +57,10 @@
         text-align: right;
         pointer-events: none;
       }
+      .back-to-labs { position: fixed; top: max(12px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); z-index: 5; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #263b36; font-size: 14px; line-height: 1.4; text-decoration: none; }
+      .back-to-labs:hover { border-color: currentColor; }
+      .back-to-labs:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+      .back-to-labs svg { width: 18px; height: 18px; }
       #fps-counter {
         position: fixed;
         top: 16px;
@@ -236,8 +240,12 @@
     <script defer src="index.js"></script>
     <script defer src="game.js"></script>
     <script defer src="sequence.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    </script>
   </head>
   <body>
+    <a class="back-to-labs" href="../"><i data-lucide="arrow-left" aria-hidden="true"></i>Back to labs</a>
     <main></main>
     <p id="fps-counter" aria-label="Frames per second">-- FPS</p>
     <p id="game-score" role="status" aria-live="polite" hidden>Score 0</p>

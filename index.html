@@ -229,6 +229,8 @@
         object-fit: cover;
         transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
       }
+      .thumbnail.room-preview { background: #c49d80; }
+      .thumbnail.room-preview img { object-fit: contain; }
       .new {
         position: absolute;
         top: 19px;
@@ -474,7 +476,7 @@
         <section aria-labelledby="experiments-title">
           <div class="catalog-heading">
             <h2 id="experiments-title">The experiments</h2>
-            <span class="count">002 & counting</span>
+            <span class="count">003 & counting</span>
           </div>
           <div class="grid">
             <a
@@ -526,6 +528,27 @@
               <p class="description" id="tv-description">
                 A 3D wooden TV with rotation, channel controls, and YouTube playback.
               </p>
+            </a>
+            <a
+              class="experiment"
+              href="./isometric-room/"
+              aria-labelledby="room-title">
+              <div class="thumbnail room-preview">
+                <img
+                  src="./assets/cozy-room-preview.png"
+                  width="1233"
+                  height="978"
+                  loading="lazy"
+                  alt="Warm isometric bedroom with gingham bedding, a writing desk, plants, and a teal rug" />
+                <span class="new">Fresh from the lab</span>
+                <span class="open" aria-hidden="true"
+                  ><i data-lucide="arrow-right"></i
+                ></span>
+              </div>
+              <div class="details">
+                <h3 id="room-title">Cozy Room</h3>
+                <span class="number">003</span>
+              </div>
             </a>
             <aside class="afterword">
               <span class="asterisk" aria-hidden="true">*</span>

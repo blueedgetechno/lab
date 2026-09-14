@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#b99178">
+	<title>Isometric Bedroom | Proanim</title>
+	<link rel="stylesheet" href="./interactions.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap">
+	<style>
+		:root { color-scheme: light; --ink: #233c38; --line: #233c3826; }
+		* { box-sizing: border-box; }
+		body { margin: 0; min-height: 100svh; color: var(--ink); background: #b99178; font-family: Georgia, serif; letter-spacing: 0; }
+		#room { position: fixed; inset: 0; }
+		.back-to-labs { position: fixed; top: max(12px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); z-index: 5; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #fff5e4; text-shadow: 0 1px 3px #30251d; font: 14px/1.4 'Space Grotesk', sans-serif; text-decoration: none; }
+		.back-to-labs:hover { border-color: currentColor; }
+		.back-to-labs:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+		.back-to-labs svg { width: 18px; height: 18px; }
+		canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+		canvas:focus-visible { outline: 2px solid var(--ink); outline-offset: -5px; }
+		.toolbar { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; gap: 4px; padding: 6px; border: 1px solid var(--line); border-radius: 8px; background: #f6f9f2ed; box-shadow: 0 6px 24px #233c3812; }
+		button { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 4px; background: transparent; color: inherit; cursor: pointer; }
+		button:hover { background: #dce7dd; }
+		button:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+		button:disabled { opacity: .35; cursor: default; }
+		button svg { width: 20px; height: 20px; stroke-width: 1.6; pointer-events: none; }
+		.divider { width: 1px; background: var(--line); margin: 8px 3px; }
+		#status { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; pointer-events: none; }
+		#status p { max-width: 32ch; margin: 0; font-size: 18px; line-height: 1.5; }
+		#status button { pointer-events: auto; background: #f6f9f2; border: 1px solid var(--line); }
+		[hidden] { display: none !important; }
+		#tooltip { position: fixed; transform: translate(-50%, -100%); max-width: calc(100vw - 24px); padding: 7px 10px; border-radius: 4px; background: var(--ink); color: #f6f9f2; font: 13px/1.3 Georgia, serif; pointer-events: none; }
+		noscript { position: fixed; inset: 40% 20px auto; text-align: center; }
+	</style>
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+				"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+				"lucide": "https://cdn.jsdelivr.net/npm/lucide@0.468.0/+esm"
+			}
+		}
+	</script>
+</head>
+<body>
+	<a class="back-to-labs" href="../"><i data-lucide="arrow-left" aria-hidden="true"></i>Back to labs</a>
+	<main id="room" aria-label="Isometric bedroom"></main>
+	<div id="status" role="status" aria-live="polite">
+		<p id="status-text">Loading bedroom...</p>
+		<button id="retry" type="button" aria-label="Retry loading" title="Retry loading" hidden>&#8635;</button>
+	</div>
+	<nav class="toolbar" aria-label="Room view controls">
+		<button id="zoom-in" type="button" aria-label="Zoom in" title="Zoom in" disabled><i data-lucide="plus"></i></button>
+		<button id="zoom-out" type="button" aria-label="Zoom out" title="Zoom out" disabled><i data-lucide="minus"></i></button>
+		<span class="divider" aria-hidden="true"></span>
+		<button id="reset-view" type="button" aria-label="Reset view" title="Reset view" disabled><i data-lucide="rotate-ccw"></i></button>
+	</nav>
+	<div id="tooltip" role="tooltip" hidden></div>
+	<noscript>JavaScript is required to display the bedroom.</noscript>
+	<script type="module">
+		const host = document.getElementById('room')
+		const status = document.getElementById('status')
+		const statusText = document.getElementById('status-text')
+		const retry = document.getElementById('retry')
+		const buttons = [...document.querySelectorAll('.toolbar button')]
+		retry.addEventListener('click', () => location.reload())
+
+		function fail(error) {
+			console.error('Bedroom viewer:', error)
+			status.hidden = false
+			statusText.textContent = location.protocol === 'file:'
+				? 'Open this room through a local web server.'
+				: 'The bedroom could not load. Check your connection and retry.'
+			retry.hidden = false
+			buttons.forEach(button => { button.disabled = true })
+		}
+
+		try {
+			const [THREE, { GLTFLoader }, { OrbitControls }, { createIcons, Plus, Minus, RotateCcw, ArrowLeft }, { RectAreaLightUniformsLib }] = await Promise.all([
+				import('three'),
+				import('three/addons/loaders/GLTFLoader.js'),
+				import('three/addons/controls/OrbitControls.js'),
+				import('lucide'),
+				import('three/addons/lights/RectAreaLightUniformsLib.js'),
+			])
+			createIcons({ icons: { Plus, Minus, RotateCcw, ArrowLeft } })
+			RectAreaLightUniformsLib.init()
+			const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+			renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+			renderer.setClearColor(0x000000, 0)
+			renderer.outputColorSpace = THREE.SRGBColorSpace
+			renderer.toneMapping = THREE.AgXToneMapping
+			renderer.toneMappingExposure = 1.15
+			renderer.shadowMap.enabled = true
+			renderer.shadowMap.type = THREE.PCFShadowMap
+			host.append(renderer.domElement)
+			renderer.domElement.tabIndex = 0
+			renderer.domElement.setAttribute('aria-label', 'Bedroom. Drag to pan, scroll or pinch to zoom. Arrow keys pan; plus and minus zoom; Home resets the view.')
+			renderer.domElement.addEventListener('webglcontextlost', event => {
+				event.preventDefault()
+				fail(new Error('Graphics context lost'))
+			})
+
+			const scene = new THREE.Scene()
+			scene.background = new THREE.Color(0xb99178)
+			scene.fog = new THREE.Fog(0xb99178, 26, 65)
+			const camera = new THREE.OrthographicCamera(-5, 5, 5, -5, .1, 100)
+			const controls = new OrbitControls(camera, renderer.domElement)
+			controls.enableRotate = false
+			controls.enableDamping = false
+			controls.minZoom = .75
+			controls.maxZoom = 2.8
+			controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }
+			controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN }
+
+			scene.add(new THREE.HemisphereLight(0xfff1dc, 0x89644b, .8))
+			const key = new THREE.DirectionalLight(0xffd4a0, 4.6)
+			key.position.set(-3, 8, 5)
+			key.target.position.set(0, 1, 0)
+			key.castShadow = true
+			const shadowSize = Math.min(2048, renderer.capabilities.maxTextureSize)
+			key.shadow.mapSize.set(shadowSize, shadowSize)
+			key.shadow.radius = 4
+			Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: .5, far: 25 })
+			key.shadow.normalBias = .012
+			key.shadow.bias = -.00004
+			scene.add(key, key.target)
+			const fill = new THREE.RectAreaLight(0xffeddb, 1.5, 5, 4)
+			fill.position.set(4, 6, 5)
+			fill.lookAt(0, 1, 0)
+			scene.add(fill)
+			const rim = new THREE.DirectionalLight(0xffdfaf, .35)
+			rim.position.set(2, 5, -5)
+			scene.add(rim)
+
+			const gltf = await new GLTFLoader().loadAsync('./bedroom.glb')
+			const model = gltf.scene
+			const palette = {
+				Bedroom_Sage: 0xe8c99a, Bedroom_Mist: 0xc8b484, Bedroom_Trim: 0xffe2ae,
+				Bedroom_Wood: 0x99501c, Bedroom_Oak: 0xc28b3c,
+				Bedroom_PlankA: 0xa96631, Bedroom_PlankB: 0xbe813f, Bedroom_PlankC: 0xd39951,
+				Bedroom_Coral: 0xd9672d, Bedroom_Peach: 0xe7a269, Bedroom_Linen: 0xf5e9ce,
+				Bedroom_Teal: 0x457d71, Bedroom_Rug: 0x438f83, Bedroom_Gold: 0xc69539,
+				Bedroom_Green: 0x355323, Bedroom_LeafLight: 0x769448, Bedroom_Terracotta: 0xb26a3b,
+				Bedroom_Sky: 0xffdc93, Bedroom_Paper: 0xf9edce,
+			}
+			const recolored = new Set()
+			const ginghamCanvas = document.createElement('canvas')
+			ginghamCanvas.width = ginghamCanvas.height = 256
+			const ginghamContext = ginghamCanvas.getContext('2d')
+			ginghamContext.fillStyle = '#fff0d5'
+			ginghamContext.fillRect(0, 0, 256, 256)
+			ginghamContext.fillStyle = '#e99764'
+			ginghamContext.fillRect(0, 0, 128, 256)
+			ginghamContext.fillRect(0, 0, 256, 128)
+			ginghamContext.fillStyle = '#ce592b'
+			ginghamContext.fillRect(0, 0, 128, 128)
+			const gingham = new THREE.CanvasTexture(ginghamCanvas)
+			gingham.colorSpace = THREE.SRGBColorSpace
+			gingham.wrapS = gingham.wrapT = THREE.RepeatWrapping
+			gingham.repeat.set(10, 12)
+			gingham.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy())
+			function fabricMaterial(source) {
+				const material = new THREE.MeshPhysicalMaterial()
+				THREE.MeshStandardMaterial.prototype.copy.call(material, source)
+				material.defines = { STANDARD: '', PHYSICAL: '' }
+				material.roughness = .92
+				material.sheen = .35
+				material.sheenColor.set(0xffe9c9)
+				material.sheenRoughness = .85
+				material.userData.scattering = 'Thin-fabric backscatter approximation'
+				material.onBeforeCompile = shader => {
+					shader.fragmentShader = shader.fragmentShader.replace('#include <lights_fragment_end>', `
+						#include <lights_fragment_end>
+						#if NUM_DIR_LIGHTS > 0
+							float backLight = max(dot(-geometryNormal, directionalLights[0].direction), 0.0);
+							float forwardScatter = pow(max(dot(geometryViewDir, -directionalLights[0].direction), 0.0), 3.0);
+							reflectedLight.directDiffuse += diffuseColor.rgb * directionalLights[0].color
+								* vec3(1.0, 0.68, 0.4) * backLight * (0.035 + forwardScatter * 0.09);
+						#endif
+					`)
+				}
+				material.customProgramCacheKey = () => 'bedroom-fabric-scatter-v1'
+				return material
+			}
+			model.traverse(object => {
+				if (object.isMesh) {
+					object.castShadow = true
+					object.receiveShadow = true
+					const material = object.material
+					if (!recolored.has(material)) {
+						if (palette[material.name] !== undefined) material.color.setHex(palette[material.name])
+						if (/Wood|Oak|Plank/.test(material.name)) material.roughness = .48
+						if (material.name === 'Bedroom_Sky') {
+							material.emissive.set(0xffcc80)
+							material.emissiveIntensity = .45
+						}
+						recolored.add(material)
+					}
+					if (/foundation|headboard|Headboard_stitch|Chair_seat|Chair_backrest|Nightstand_drawer/.test(object.name)) {
+						object.material = material.clone()
+						object.material.color.set(/foundation/.test(object.name) ? 0xe6bf83 : 0xba782c)
+						object.material.roughness = .5
+					}
+					if (/duvet|Duvet|pillow|cushion|runner|Woven_rug|Pouf|lamp_shade/.test(object.name)) {
+						object.material = fabricMaterial(object.material)
+						if (/duvet|Duvet/.test(object.name)) {
+							object.material.map = gingham
+							object.material.color.set(0xffffff)
+						}
+						if (/lamp_shade/.test(object.name)) {
+							object.material.emissive.set(0xffc877)
+							object.material.emissiveIntensity = .3
+						}
+					}
+				}
+			})
+			scene.add(model)
+			const lamp = new THREE.PointLight(0xffbd69, 3, 2.6, 2)
+			const lampGlow = model.getObjectByName('Lamp_glowing_underside')
+			if (lampGlow) {
+				lampGlow.getWorldPosition(lamp.position)
+				lamp.position.y -= .04
+				scene.add(lamp)
+			}
+			const bounds = new THREE.Box3().setFromObject(model)
+			const center = bounds.getCenter(new THREE.Vector3())
+			const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0xb28b73, roughness: 1 }))
+			ground.rotation.x = -Math.PI / 2
+			ground.position.y = bounds.min.y - .015
+			ground.receiveShadow = true
+			scene.add(ground)
+
+			camera.position.copy(center).add(new THREE.Vector3(10, 10, 10))
+			camera.lookAt(center)
+			controls.target.copy(center)
+			controls.update()
+			camera.updateMatrixWorld()
+			const projected = new THREE.Box3()
+			for (const positionX of [bounds.min.x, bounds.max.x]) {
+				for (const positionY of [bounds.min.y, bounds.max.y]) {
+					for (const positionZ of [bounds.min.z, bounds.max.z]) {
+						projected.expandByPoint(new THREE.Vector3(positionX, positionY, positionZ).applyMatrix4(camera.matrixWorldInverse))
+					}
+				}
+			}
+			const viewSize = projected.getSize(new THREE.Vector3())
+			const render = () => renderer.render(scene, camera)
+			const offset = new THREE.Vector3()
+			const clampedTarget = new THREE.Vector3()
+			controls.addEventListener('change', () => {
+				clampedTarget.copy(controls.target).clamp(center.clone().addScalar(-2), center.clone().addScalar(2))
+				offset.copy(clampedTarget).sub(controls.target)
+				controls.target.add(offset)
+				camera.position.add(offset)
+				render()
+			})
+			function resize() {
+				const width = host.clientWidth
+				const height = host.clientHeight
+				const aspect = width / Math.max(height, 1)
+				const halfHeight = Math.max(viewSize.y / .76, viewSize.x / (.88 * aspect)) / 2
+				Object.assign(camera, { left: -halfHeight * aspect, right: halfHeight * aspect, top: halfHeight, bottom: -halfHeight })
+				camera.updateProjectionMatrix()
+				renderer.setSize(width, height)
+				render()
+			}
+			function zoom(factor) {
+				camera.zoom = THREE.MathUtils.clamp(camera.zoom * factor, controls.minZoom, controls.maxZoom)
+				camera.updateProjectionMatrix()
+				render()
+			}
+			function resetView() {
+				camera.zoom = 1
+				camera.position.copy(center).add(new THREE.Vector3(10, 10, 10))
+				controls.target.copy(center)
+				camera.lookAt(center)
+				controls.update()
+				resize()
+			}
+			document.getElementById('zoom-in').addEventListener('click', () => zoom(1.2))
+			document.getElementById('zoom-out').addEventListener('click', () => zoom(1 / 1.2))
+			document.getElementById('reset-view').addEventListener('click', resetView)
+			controls.listenToKeyEvents(renderer.domElement)
+			renderer.domElement.addEventListener('keydown', event => {
+				if (!['+', '=', '-', 'Home'].includes(event.key)) return
+				event.preventDefault()
+				if (event.key === 'Home') resetView()
+				else zoom(event.key === '-' ? 1 / 1.2 : 1.2)
+			})
+			const tooltip = document.getElementById('tooltip')
+			for (const button of buttons) {
+				button.disabled = false
+				button.removeAttribute('title')
+				const showTooltip = () => {
+					const rect = button.getBoundingClientRect()
+					tooltip.textContent = button.getAttribute('aria-label')
+					tooltip.style.left = `${rect.left + rect.width / 2}px`
+					tooltip.style.top = `${rect.top - 12}px`
+					tooltip.hidden = false
+				}
+				button.addEventListener('pointerenter', showTooltip)
+				button.addEventListener('focus', showTooltip)
+				button.addEventListener('pointerleave', () => { tooltip.hidden = true })
+				button.addEventListener('blur', () => { tooltip.hidden = true })
+				button.addEventListener('click', () => { tooltip.hidden = true })
+			}
+			new ResizeObserver(resize).observe(host)
+			resize()
+			status.hidden = true
+			window.bedroomScene = { scene, camera, renderer, controls, model, bounds, resetView }
+			const { setupInteractions } = await import('./interactions.js')
+			window.bedroomScene.interactions = await setupInteractions({ THREE, scene, camera, renderer, model, controls, key, fill, rim, lamp, render })
+		} catch (error) {
+			fail(error)
+		}
+	</script>
+</body>
+</html>
