@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<base href="/jev-country/">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#090909">
+	<title>Jev Country | Ask the World. Watch the Flags Fly.</title>
+	<meta name="description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.">
+	<meta name="author" content="Blue Edge">
+	<link rel="canonical" href="https://lab.blueedge.me/jev-country/">
+	<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="Blue Edge Lab">
+	<meta property="og:title" content="Jev Country | Ask the World. Watch the Flags Fly.">
+	<meta property="og:description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.">
+	<meta property="og:url" content="https://lab.blueedge.me/jev-country/">
+	<meta property="og:image" content="https://lab.blueedge.me/assets/jev-country-preview.png">
+	<meta property="og:image:type" content="image/png">
+	<meta property="og:image:width" content="1000">
+	<meta property="og:image:height" content="625">
+	<meta property="og:image:alt" content="Colorful country flags piled beneath Jev's search box on a dark canvas">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@blueedgetechno">
+	<meta name="twitter:creator" content="@blueedgetechno">
+	<meta name="twitter:title" content="Jev Country | Ask the World. Watch the Flags Fly.">
+	<meta name="twitter:description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.">
+	<meta name="twitter:image" content="https://lab.blueedge.me/assets/jev-country-preview.png">
+	<meta name="twitter:image:alt" content="Colorful country flags piled beneath Jev's search box on a dark canvas">
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebApplication",
+			"name": "Jev Country",
+			"url": "https://lab.blueedge.me/jev-country/",
+			"description": "195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.",
+			"image": "https://lab.blueedge.me/assets/jev-country-preview.png",
+			"applicationCategory": "EducationalApplication",
+			"operatingSystem": "Any",
+			"inLanguage": "en",
+			"isAccessibleForFree": true,
+			"creator": {
+				"@type": "Person",
+				"name": "Blue Edge",
+				"url": "https://blueedge.me",
+				"sameAs": ["https://x.com/blueedgetechno"]
+			}
+		}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://flagcdn.com">
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+	<style>
+		:root { color-scheme: dark; --bg: #090909; --surface: #131313; --line: #292929; --text: #ededeb; --muted: #858582; --accent: #d4f5aa; }
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; letter-spacing: 0; overflow: hidden; }
+		button, input { font: inherit; }
+		button { color: inherit; cursor: pointer; }
+		button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+		button { -webkit-tap-highlight-color: transparent; }
+		button:disabled { cursor: wait; opacity: .5; }
+		[hidden] { display: none !important; }
+		.app { position: relative; height: 100svh; isolation: isolate; overflow: hidden; background: var(--bg); }
+		.icon-button { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 6px; background: #111111d9; display: grid; place-items: center; transition: border-color .2s, background .2s; }
+		.icon-button:hover { background: #222; border-color: #51514d; }
+		.icon-button svg { width: 16px; height: 16px; stroke-width: 1.5; }
+		.settings-button { position: absolute; z-index: 5; right: 30px; top: 28px; color: #9d9d97; }
+		.back-link { position: absolute; z-index: 5; left: 30px; top: 28px; height: 36px; display: inline-flex; align-items: center; gap: 8px; color: #9d9d97; font-size: 12px; text-decoration: none; }
+		.back-link:hover { color: var(--text); }
+		.back-link svg { width: 16px; height: 16px; flex-shrink: 0; stroke-width: 1.5; }
+		#flag-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; touch-action: none; }
+		.search-area { position: absolute; z-index: 3; top: 50%; left: 50%; transform: translate(-50%, -34px); width: min(600px, calc(100% - 48px)); }
+		.search-box { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; gap: 12px; padding: 12px 20px; height: 68px; border: 1px solid #ffffff24; border-radius: 7px; background: #151717a6; backdrop-filter: blur(20px) saturate(140%); box-shadow: inset 0 1px #ffffff16, inset 0 -1px #ffffff08, 0 12px 50px #0005; transition: border-color .2s, box-shadow .2s; }
+		.search-box::before { content: ''; position: absolute; z-index: -1; inset: -100% -80%; pointer-events: none; background: linear-gradient(115deg, transparent 25%, #7bb9b911 38%, #cbdccb24 45%, #ffffff22 48%, #d5b98113 53%, transparent 66%); animation: glass-drift 9s ease-in-out infinite alternate; }
+		@keyframes glass-drift { from { transform: translateX(-20%) rotate(-5deg); } to { transform: translateX(20%) rotate(5deg); } }
+		.search-box:focus-within { border-color: #75786a; box-shadow: 0 0 0 4px #d4f5aa06, 0 12px 50px #0005; }
+		.search-icon { width: 19px; height: 19px; color: #767670; flex-shrink: 0; stroke-width: 1.5; }
+		#query { width: 100%; min-width: 0; border: 0; outline: none; color: #eeeee8; background: none; font-size: 16px; }
+		#query::placeholder { color: #6c6c68; }
+		.processing { position: relative; flex: 0 0 26px; width: 26px; height: 26px; overflow: hidden; border: 1px solid #d4f5aa55; border-radius: 50%; background: #d4f5aa0c; color: #d4f5aa; box-shadow: inset 0 0 6px #d4f5aa18, 0 0 10px #d4f5aa12; }
+		.processing::before, .processing::after { content: ''; position: absolute; left: -50%; top: 42%; width: 200%; height: 200%; border-radius: 42%; background: currentColor; animation: liquid-swirl 2.6s linear infinite; }
+		.processing::after { top: 50%; border-radius: 39%; background: #7baf8d; opacity: .65; animation-duration: 3.8s; animation-direction: reverse; animation-delay: -1.3s; }
+		.processing[hidden] { display: block !important; visibility: hidden; }
+		.processing[hidden]::before, .processing[hidden]::after { animation-play-state: paused; }
+		@keyframes liquid-swirl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+		.search-meta { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 10px; }
+		.suggestions { display: flex; justify-content: flex-start; min-width: 0; gap: 13px; overflow-x: auto; scrollbar-width: none; }
+		.indexed-count { flex-shrink: 0; color: #82847d; font: 9px 'IBM Plex Mono', monospace; white-space: nowrap; }
+		.suggestions::-webkit-scrollbar { display: none; }
+		.suggestion { flex: 0 0 auto; border: 0; background: none; color: #767670; font-size: 10px; padding: 4px 0; white-space: nowrap; }
+		.suggestion:hover { color: #d5d8cd; }
+		.suggestion:focus-visible { outline-offset: -1px; }
+		.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+		#empty-state { position: absolute; bottom: 100%; width: 100%; text-align: center; margin: 0 0 24px; font-size: 11px; color: #81817b; }
+		.results-glass { position: absolute; z-index: 1; pointer-events: none; border: 1px solid #ffffff26; border-radius: 8px; background: linear-gradient(125deg, #d3e9e916, #20252570 45%, #d8e5c90d); backdrop-filter: blur(18px) saturate(130%); box-shadow: inset 0 1px #ffffff18, inset 0 -1px #ffffff08, 0 12px 36px #0004; opacity: 0; transition: opacity .22s ease; }
+		#flag-results { position: absolute; inset: 0; pointer-events: none; z-index: 2; opacity: 0; transition: opacity .22s ease; }
+		.results-glass.is-visible, #flag-results.is-visible { opacity: 1; }
+		.flag-result { position: absolute; padding: 0; border: 0; background: transparent; pointer-events: auto; border-radius: 3px; }
+		.flag-result img { display: block; width: 100%; height: 100%; object-fit: contain; transform: rotate(var(--flag-angle, 0rad)); pointer-events: none; }
+		.match-score { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); padding: 3px 6px; border: 1px solid #ffffff24; border-radius: 4px; background: #121212e8; color: #a5a5a1; font: 10px 'IBM Plex Mono', monospace; white-space: nowrap; }
+		.world-controls { position: absolute; z-index: 4; right: 28px; bottom: 29px; display: flex; gap: 7px; }
+		.canvas-tooltip { position: fixed; z-index: 6; width: min(280px, calc(100vw - 24px)); background: #202020f5; backdrop-filter: blur(16px); color: #ebeee5; border: 1px solid #3c3c3c; box-shadow: 0 10px 40px #0005; padding: 10px 12px; border-radius: 6px; font-size: 11px; }
+		.canvas-tooltip::before { content: ''; position: absolute; width: 11px; height: 11px; background: #202020; border: solid #3c3c3c; transform: rotate(45deg); }
+		.canvas-tooltip[data-side=right]::before { left: -7px; top: var(--arrow-offset, 50%); border-width: 0 0 1px 1px; }
+		.canvas-tooltip[data-side=left]::before { right: -7px; top: var(--arrow-offset, 50%); border-width: 1px 1px 0 0; }
+		.canvas-tooltip[data-side=top]::before { bottom: -7px; left: var(--arrow-offset, 50%); border-width: 0 1px 1px 0; }
+		.canvas-tooltip[data-side=bottom]::before { top: -7px; left: var(--arrow-offset, 50%); border-width: 1px 0 0 1px; }
+		#tooltip-name { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+		#tooltip-description { margin: 0 0 8px; color: #a4a4a4; line-height: 1.45; }
+		.country-stats { display: flex; flex-wrap: wrap; gap: 7px 14px; color: #929292; font-size: 10px; line-height: 1.6; }
+		.canvas-tooltip .country-stats { gap: 4px 10px; line-height: 1.4; }
+		.country-stats a { color: inherit; text-decoration: none; }
+		.country-stats a:hover { color: #deded9; text-decoration: underline; }
+		dialog { color: var(--text); border: 1px solid #3b3f33; border-radius: 8px; background: #141511; padding: 25px; width: min(380px, calc(100% - 40px)); box-shadow: 0 30px 100px #0009; }
+		dialog::backdrop { background: #0009; backdrop-filter: blur(5px); }
+		.dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+		.dialog-header h2 { margin: 0; font-size: 17px; font-weight: 550; }
+		.setting { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 23px; font-size: 13px; }
+		input[type=range] { width: 140px; accent-color: #c4dc9f; }
+		input[type=checkbox] { width: 17px; height: 17px; accent-color: #c4dc9f; }
+		#detail-flag { width: 66px; height: 45px; object-fit: contain; object-position: left; margin-bottom: 20px; }
+		#detail-fact { color: #aaaf9f; line-height: 1.8; }
+		.detail-label { font: 10px 'IBM Plex Mono', monospace; color: #757c68; }
+		.data-sources { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); color: #81817b; font-size: 10px; line-height: 1.8; }
+		.data-sources a { color: #aaa; }
+		@media (min-width: 1600px) { .search-area { width: 650px; } }
+		@media (max-width: 600px) {
+			.settings-button { right: 18px; top: 22px; width: 32px; height: 32px; }
+			.back-link { left: 18px; top: 22px; height: 32px; }
+			.search-area { width: calc(100% - 36px); transform: translate(-50%, -31px); }
+			.search-box { padding-left: 14px; gap: 9px; height: 62px; } #query { font-size: 14px; }
+			.search-meta { gap: 12px; } .suggestions { gap: 12px; } .suggestion { font-size: 9px; } .indexed-count { font-size: 8px; }
+			.world-controls { right: 17px; bottom: 18px; }
+		}
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+	</style>
+</head>
+<body>
+	<main class="app">
+		<canvas id="flag-canvas" aria-hidden="true"></canvas>
+		<a class="back-link" href="../"><i data-lucide="arrow-left" aria-hidden="true"></i><span>Back to Lab</span></a>
+		<button class="icon-button settings-button" id="settings-button" aria-label="Settings" title="Settings"><i data-lucide="sliders-horizontal"></i></button>
+		<div class="results-glass" id="results-glass" aria-hidden="true"></div>
+		<div id="flag-results" role="group" aria-label="Matching countries"></div>
+		<section class="search-area" aria-label="Country search">
+			<p id="empty-state" hidden>No matches. Try another question.</p>
+			<form class="search-box" id="search-form" role="search">
+				<i data-lucide="search" class="search-icon"></i>
+				<input id="query" aria-label="Ask about a country" placeholder="Describe a country..." autocomplete="off" maxlength="240">
+				<div class="processing" id="processing" role="progressbar" aria-label="Processing search" hidden></div>
+			</form>
+			<span id="search-status" class="sr-only" role="status"></span>
+			<div class="search-meta">
+			<div class="suggestions" id="suggestions" aria-label="Suggested questions">
+				<button class="suggestion" data-query="Which is the richest country in the world?">Richest country?</button>
+				<button class="suggestion" data-query="Which countries are famous for playing cricket?">Famous for cricket?</button>
+				<button class="suggestion" data-query="Which countries have red and white flags?">Red &amp; white flags?</button>
+				<button class="suggestion" data-query="Where can I see the northern lights?">Northern lights?</button>
+			</div>
+			<span class="indexed-count" id="indexed-count">195 flags indexed</span>
+			</div>
+		</section>
+		<div class="world-controls">
+			<button class="icon-button" id="shuffle" aria-label="Shuffle flags" title="Shuffle flags"><i data-lucide="shuffle"></i></button>
+		</div>
+		<div class="canvas-tooltip" id="tooltip" role="tooltip" hidden>
+			<strong id="tooltip-name"></strong>
+			<p id="tooltip-description"></p>
+			<div class="country-stats" id="tooltip-stats"></div>
+		</div>
+		<dialog id="settings">
+			<div class="dialog-header"><h2>Make yourself at home.</h2><button class="icon-button" data-close="settings" aria-label="Close settings"><i data-lucide="x"></i></button></div>
+			<label class="setting" for="gravity">Gravity<input id="gravity" type="range" min="0.2" max="2" step="0.1" value="1"></label>
+			<label class="setting" for="motion">Flag motion<input id="motion" type="checkbox" checked></label>
+			<p class="data-sources">Population &amp; GDP: <a href="https://data.worldbank.org/" target="_blank" rel="noopener noreferrer">The World Bank, World Development Indicators</a> and its data providers (<a href="https://data.worldbank.org/summary-terms-of-use" target="_blank" rel="noopener noreferrer">CC BY 4.0 &amp; terms</a>). Country metadata adapted from <a href="https://github.com/mledoze/countries" target="_blank" rel="noopener noreferrer">mledoze/countries</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>). <a href="logic/country-stats.js" download>Data snapshot</a>.</p>
+		</dialog>
+		<dialog id="country-detail">
+			<div class="dialog-header"><h2 id="detail-name"></h2><button class="icon-button" data-close="country-detail" aria-label="Close country details"><i data-lucide="x"></i></button></div>
+			<img id="detail-flag" alt="">
+			<p id="detail-fact"></p><div class="country-stats" id="detail-stats"></div><p class="detail-label">WORLD BANK DATA / MOCK SEARCH MATCHES</p>
+		</dialog>
+	</main>
+	<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+	<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+	<script src="logic/country-stats.js"></script>
+	<script src="logic/data.js"></script>
+	<script src="logic/ui.js"></script>
+	<script src="logic/search.js"></script>
+	<script src="logic/flags.js"></script>
+</body>
+</html>
