@@ -26,6 +26,7 @@ const countries = countryCodes.map(code => {
 		: `A country in ${location}${metadata.capital ? `, with its capital in ${metadata.capital}` : ''}.`;
 	return { ...metadata, code, description, name: code === 'va' ? 'Vatican City' : names.of(code.toUpperCase()) };
 });
+
 const mockTopics = [
 	{ pattern: /rich|wealth|gdp|money|econom/, label: 'Wealth, by GDP per person.', answers: [['lu', 'A high-income financial hub.'], ['sg', 'A global center for finance and trade.'], ['ie', 'A high GDP per capita economy.']], detail: 'Illustrative GDP-per-capita matches. The answer depends on the year, source, and whether you mean total GDP, wealth, or GDP per person.' },
 	{ pattern: /cricket|batting|wicket|ipl/, label: 'Cricket is a way of life here.', answers: [['in', 'Home to the IPL and a huge cricket following.'], ['au', 'A long history of international cricket success.'], ['pk', 'A passionate, cricket-loving nation.'], ['gb', 'England is the birthplace of cricket.'], ['lk', 'An island with a celebrated cricket tradition.'], ['bd', 'Cricket is the most popular sport.']] },

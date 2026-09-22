@@ -6,14 +6,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="theme-color" content="#090909">
 	<title>Jev Country | Ask the World. Watch the Flags Fly.</title>
-	<meta name="description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.">
+	<meta name="description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with TypeSafe AI country matching and World Bank stats.">
 	<meta name="author" content="Blue Edge">
 	<link rel="canonical" href="https://lab.blueedge.me/jev-country/">
 	<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="Blue Edge Lab">
 	<meta property="og:title" content="Jev Country | Ask the World. Watch the Flags Fly.">
-	<meta property="og:description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.">
+	<meta property="og:description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with TypeSafe AI country matching and World Bank stats.">
 	<meta property="og:url" content="https://lab.blueedge.me/jev-country/">
 	<meta property="og:image" content="https://lab.blueedge.me/assets/jev-country-preview.png">
 	<meta property="og:image:type" content="image/png">
@@ -24,7 +24,7 @@
 	<meta name="twitter:site" content="@blueedgetechno">
 	<meta name="twitter:creator" content="@blueedgetechno">
 	<meta name="twitter:title" content="Jev Country | Ask the World. Watch the Flags Fly.">
-	<meta name="twitter:description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.">
+	<meta name="twitter:description" content="195 countries. One question. A world of flags. Explore Jev's playful country playground, with TypeSafe AI country matching and World Bank stats.">
 	<meta name="twitter:image" content="https://lab.blueedge.me/assets/jev-country-preview.png">
 	<meta name="twitter:image:alt" content="Colorful country flags piled beneath Jev's search box on a dark canvas">
 	<script type="application/ld+json">
@@ -33,7 +33,7 @@
 			"@type": "WebApplication",
 			"name": "Jev Country",
 			"url": "https://lab.blueedge.me/jev-country/",
-			"description": "195 countries. One question. A world of flags. Explore Jev's playful country playground, with curated mock answers and real World Bank stats.",
+			"description": "195 countries. One question. A world of flags. Explore Jev's playful country playground, with TypeSafe AI country matching and World Bank stats.",
 			"image": "https://lab.blueedge.me/assets/jev-country-preview.png",
 			"applicationCategory": "EducationalApplication",
 			"operatingSystem": "Any",
@@ -172,12 +172,14 @@
 			<div class="dialog-header"><h2>Make yourself at home.</h2><button class="icon-button" data-close="settings" aria-label="Close settings"><i data-lucide="x"></i></button></div>
 			<label class="setting" for="gravity">Gravity<input id="gravity" type="range" min="0.2" max="2" step="0.1" value="1"></label>
 			<label class="setting" for="motion">Flag motion<input id="motion" type="checkbox" checked></label>
+			<label class="setting" for="mock-search">Mock search<input id="mock-search" type="checkbox"></label>
+			<label class="setting" for="use-openjev">Use OpenJev<input id="use-openjev" type="checkbox" checked></label>
 			<p class="data-sources">Population &amp; GDP: <a href="https://data.worldbank.org/" target="_blank" rel="noopener noreferrer">The World Bank, World Development Indicators</a> and its data providers (<a href="https://data.worldbank.org/summary-terms-of-use" target="_blank" rel="noopener noreferrer">CC BY 4.0 &amp; terms</a>). Country metadata adapted from <a href="https://github.com/mledoze/countries" target="_blank" rel="noopener noreferrer">mledoze/countries</a> (<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>). <a href="logic/country-stats.js" download>Data snapshot</a>.</p>
 		</dialog>
 		<dialog id="country-detail">
 			<div class="dialog-header"><h2 id="detail-name"></h2><button class="icon-button" data-close="country-detail" aria-label="Close country details"><i data-lucide="x"></i></button></div>
 			<img id="detail-flag" alt="">
-			<p id="detail-fact"></p><div class="country-stats" id="detail-stats"></div><p class="detail-label">WORLD BANK DATA / MOCK SEARCH MATCHES</p>
+			<p id="detail-fact"></p><div class="country-stats" id="detail-stats"></div><p class="detail-label">WORLD BANK DATA / COUNTRY MATCHES</p>
 		</dialog>
 	</main>
 	<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>

@@ -1,0 +1,14 @@
+{
+  "name": "blue-edge-lab",
+  "private": true,
+  "scripts": {
+    "start": "node --env-file-if-exists=.env.local common/serve.cjs",
+    "test": "node --test jev-country/*.test.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "ai": "7.0.111"
+  }
+}

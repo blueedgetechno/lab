@@ -13,8 +13,14 @@ const types = {
   ".jpg": "image/jpeg",
   ".webp": "image/webp",
 }
+let countrySearchHandler
 
 const server = http.createServer(async (request, response) => {
+  if (request.url?.split("?")[0] === "/api/jev-country") {
+    countrySearchHandler ||= require("../jev-country/server.cjs").createCountrySearchHandler()
+    await countrySearchHandler(request, response)
+    return
+  }
   if (request.method !== "GET" && request.method !== "HEAD") {
     response.writeHead(405, { Allow: "GET, HEAD" })
     response.end()
@@ -23,6 +29,11 @@ const server = http.createServer(async (request, response) => {
   let file
   try {
     const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname)
+    if (/[\\:\0]/.test(pathname) || pathname.split("/").some(segment => segment.startsWith(".") || segment.replace(/[. ]+$/, "").toLowerCase() === "node_modules") || /\.(?:cjs|mjs|code-workspace)[. ]*$/i.test(pathname)) {
+      response.writeHead(403)
+      response.end("Forbidden")
+      return
+    }
     file = path.resolve(root, `.${pathname}`)
     const relative = path.relative(root, file)
     if (relative.startsWith("..") || path.isAbsolute(relative)) {
@@ -50,6 +61,6 @@ const server = http.createServer(async (request, response) => {
   }
 })
 
-server.listen(0, "127.0.0.1", () => {
-  console.log(`Vintage TV: http://127.0.0.1:${server.address().port}/vintage-tv/`)
+server.listen(Number(process.env.PORT ?? 3000), "127.0.0.1", () => {
+  console.log(`Blue Edge Lab: http://127.0.0.1:${server.address().port}/`)
 })

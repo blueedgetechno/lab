@@ -8,6 +8,7 @@ const SCALE_DURATION_MS = FLIGHT_DURATION_MS * 0.1;
 const ROTATION_DURATION_MS = FLIGHT_DURATION_MS * 1.5;
 const RECYCLE_INTERVAL_MS = 500;
 const RESULTS_FADE_MS = 220;
+const RESULT_SIZE_MULTIPLIER = 1.5;
 let resultsFadeTimer;
 let paused = false;
 let worldWidth = 0, worldHeight = 0, flagWidth = 0, flagHeight = 0;
@@ -48,6 +49,27 @@ function rebuildWorld() {
 	}
 	updateFlagTargets(lastAnswer?.countries || []);
 }
+function getResultTargets(count) {
+	if (!count) { searchArea.style.marginTop = ''; return []; }
+	const searchRect = document.querySelector('.search-box').getBoundingClientRect();
+	const baseSpacing = Math.min(78, (searchRect.width - 12) / Math.max(count, 1));
+	const width = Math.min(54, baseSpacing - 12) * RESULT_SIZE_MULTIPLIER;
+	const spacing = baseSpacing * RESULT_SIZE_MULTIPLIER;
+	const columns = Math.max(1, Math.min(count, Math.floor((worldWidth - 68 - width) / spacing) + 1));
+	const rows = Math.ceil(count / columns);
+	const rowHeight = flagHeight * width / flagWidth + 50;
+	const searchTop = searchRect.top - (Number.parseFloat(searchArea.style.marginTop) || 0);
+	const offset = Math.max(0, 72 + 62 + flagHeight * width / flagWidth / 2 + 46 + (rows - 1) * rowHeight - searchTop);
+	searchArea.style.marginTop = `${offset}px`;
+	return Array.from({ length: count }, (_, index) => {
+		const row = Math.floor(index / columns);
+		const columnsInRow = Math.min(columns, count - row * columns);
+		return {
+			position: { x: worldWidth / 2 + (index % columns - (columnsInRow - 1) / 2) * spacing, y: searchTop + offset - 62 - (rows - row - 1) * rowHeight },
+			scale: width / flagWidth
+		};
+	});
+}
 function resizeWorld(previousWidth, previousHeight) {
 	if (engine) {
 		physics.Body.scale(walls[0], (worldWidth + 160) / (previousWidth + 160), 1);
@@ -57,8 +79,7 @@ function resizeWorld(previousWidth, previousHeight) {
 		physics.Body.setPosition(walls[2], { x: worldWidth + 30, y: -worldHeight });
 	}
 	const resultButtons = [...results.children];
-	const searchRect = document.querySelector('.search-box').getBoundingClientRect();
-	const spacing = Math.min(78, (searchRect.width - 12) / Math.max(resultButtons.length, 1));
+	const targets = getResultTargets(resultButtons.length);
 	for (const body of bodies) {
 		const halfWidth = (Math.abs(Math.cos(body.angle)) * flagWidth + Math.abs(Math.sin(body.angle)) * flagHeight) / 2;
 		const halfHeight = (Math.abs(Math.sin(body.angle)) * flagWidth + Math.abs(Math.cos(body.angle)) * flagHeight) / 2;
@@ -75,8 +96,8 @@ function resizeWorld(previousWidth, previousHeight) {
 		if (!body.target) continue;
 		body.flight.position = resizePosition(body.flight.position);
 		const index = resultButtons.indexOf(body.resultButton);
-		Object.assign(body.target, { x: worldWidth / 2 + (index - (resultButtons.length - 1) / 2) * spacing, y: searchRect.top - 62 });
-		body.targetScale = Math.min(54, spacing - 12) / flagWidth;
+		Object.assign(body.target, targets[index].position);
+		body.targetScale = targets[index].scale;
 	}
 	if (engine && paused && worldWidth < previousWidth) {
 		const velocities = bodies.map(body => ({ velocity: { ...body.velocity }, angularVelocity: body.angularVelocity }));
@@ -136,25 +157,25 @@ function updateFlagTargets(matches, immediate = false) {
 		}
 	}
 	results.replaceChildren();
-	const searchRect = document.querySelector('.search-box').getBoundingClientRect();
-	const spacing = Math.min(78, (searchRect.width - 12) / Math.max(matches.length, 1));
+	const targets = getResultTargets(matches.length);
 	matches.forEach((country, index) => {
 		const body = bodies.find(item => item.country.code === country.code);
 		if (!body) return;
 		if (!body.target) body.returnPosition = { x: body.position.x, y: Math.max(worldHeight - 80, body.position.y) };
-		body.target = { x: worldWidth / 2 + (index - (matches.length - 1) / 2) * spacing, y: searchRect.top - 62 };
-		body.targetScale = Math.min(54, spacing - 12) / flagWidth;
+		body.target = targets[index].position;
+		body.targetScale = targets[index].scale;
 		body.flight = { position: { ...body.position }, angle: body.angle, scale: body.visualScale, elapsed: 0 };
 		body.scaleTransition = null;
 		if (engine) { physics.Body.setStatic(body, true); body.collisionFilter.mask = 0; }
 		const button = document.createElement('button');
 		button.className = 'flag-result'; button.dataset.name = country.name;
-		button.setAttribute('aria-label', `${country.name}, ${country.score}% mock match`);
+		const providerName = country.provider === 'openjev' ? 'OpenJev' : 'Jev';
+		button.setAttribute('aria-label', `${country.name}, ${country.score}% ${country.mock ? 'mock match' : `${providerName} match probability`}`);
 		const image = document.createElement('img');
 		image.src = images.get(country.code).src; image.alt = ''; image.draggable = false;
 		const badge = document.createElement('span');
 		badge.className = 'match-score'; badge.textContent = `${country.score}%`;
-		badge.title = 'Mock relevance score; not a measured confidence level';
+		badge.title = country.mock ? 'Mock relevance score; not a measured confidence level' : `${providerName}-estimated probability of matching your query; not a verified fact`;
 		button.append(image, badge);
 		button.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') showCountryTooltip(country, () => getFlagRect(body), button); });
 		button.addEventListener('pointerleave', () => hideCountryTooltip());
