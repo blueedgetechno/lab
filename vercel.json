@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/jev-country.js": {
+      "maxDuration": 30,
+      "includeFiles": "jev-country/logic/{country-stats,data}.js"
+    }
+  },
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/procedurally-fish-animation/index.html", "destination": "/procedurally-fish-animation/", "permanent": true }
+  ]
+}

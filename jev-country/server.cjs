@@ -87,7 +87,9 @@ function createCountrySearchHandler({
   openJevApiKey = process.env.OPENJEV_API_KEY,
   fetchOpenJev = fetch,
   now = Date.now,
+  allowedOrigins,
 } = {}) {
+  const configuredOrigins = allowedOrigins?.map(origin => new URL(origin).origin)
   const cache = new Map()
   let activeRequests = 0
   let windowStart = now()
@@ -103,14 +105,15 @@ function createCountrySearchHandler({
       )
       return
     }
-    const allowedHosts = [
-      `127.0.0.1:${request.socket.localPort}`,
-      `localhost:${request.socket.localPort}`,
+    const origins = configuredOrigins ?? [
+      `http://127.0.0.1:${request.socket.localPort}`,
+      `http://localhost:${request.socket.localPort}`,
     ]
+    const requestOrigin = origins.find(origin => new URL(origin).host === request.headers.host)
     if (
-      !allowedHosts.includes(request.headers.host) ||
+      !requestOrigin ||
       (request.headers.origin &&
-        request.headers.origin !== `http://${request.headers.host}`) ||
+        request.headers.origin !== requestOrigin) ||
       request.headers["sec-fetch-site"] === "cross-site"
     ) {
       sendJson(response, 403, {
@@ -127,18 +130,33 @@ function createCountrySearchHandler({
     }
     let input
     try {
-      const chunks = []
-      let size = 0
-      for await (const chunk of request.iterator({ destroyOnReturn: false })) {
-        size += chunk.length
-        if (size > 4096) {
-          request.resume()
+      if (Number(request.headers["content-length"]) > 4096) {
+        request.resume?.()
+        sendJson(response, 413, { error: "Search request is too large." })
+        return
+      }
+      const parsedBody = request.body
+      if (parsedBody !== undefined) {
+        const text = Buffer.isBuffer(parsedBody) ? parsedBody.toString("utf8") : typeof parsedBody === "string" ? parsedBody : JSON.stringify(parsedBody)
+        if (Buffer.byteLength(text, "utf8") > 4096) {
           sendJson(response, 413, { error: "Search request is too large." })
           return
         }
-        chunks.push(chunk)
+        input = JSON.parse(text)
+      } else {
+        const chunks = []
+        let size = 0
+        for await (const chunk of request.iterator({ destroyOnReturn: false })) {
+          size += chunk.length
+          if (size > 4096) {
+            request.resume()
+            sendJson(response, 413, { error: "Search request is too large." })
+            return
+          }
+          chunks.push(chunk)
+        }
+        input = JSON.parse(Buffer.concat(chunks).toString("utf8"))
       }
-      input = JSON.parse(Buffer.concat(chunks).toString("utf8"))
     } catch {
       sendJson(response, 400, { error: "Send a valid JSON query." })
       return

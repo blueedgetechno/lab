@@ -1,9 +1,11 @@
 const test = require("node:test")
 const assert = require("node:assert/strict")
 const http = require("node:http")
-const { once } = require("node:events")
+const { once, EventEmitter } = require("node:events")
 const { spawn } = require("node:child_process")
 const path = require("node:path")
+const fs = require("node:fs")
+const vm = require("node:vm")
 const { createCountrySearchHandler } = require("./server.cjs")
 
 async function startServer(context, options) {
@@ -18,6 +20,113 @@ async function startServer(context, options) {
 function answersFor(questions, probabilities = {}) {
   return { answers: Object.fromEntries(Object.keys(questions).map(code => [code, { type: "boolean", probability: probabilities[code] ?? 0.01 }])) }
 }
+
+async function invokeHostedHandler(handler, overrides = {}) {
+  const request = {
+    method: "POST",
+    headers: { host: "lab.example.com", origin: "https://lab.example.com", "content-type": "application/json" },
+    socket: { localPort: 12345 },
+    body: { query: "India", provider: "vercel" },
+    ...overrides,
+  }
+  const response = new EventEmitter()
+  response.writeHead = (status, headers) => { response.status = status; response.headers = headers }
+  response.end = text => { response.body = JSON.parse(text) }
+  await handler(request, response)
+  return response
+}
+
+test("hosted handler accepts Vercel parsed bodies and preserves validation", async () => {
+  let calls = 0
+  const handler = createCountrySearchHandler({
+    allowedOrigins: ["https://lab.example.com"],
+    apiKey: "test-key-not-real",
+    evaluate: async ({ questions }) => { calls++; return answersFor(questions, { in: .98 }) },
+  })
+  for (const body of [{ query: "India", provider: "vercel" }, '{"query":"India","provider":"vercel"}', Buffer.from('{"query":"India","provider":"vercel"}')]) {
+    const response = await invokeHostedHandler(handler, { body })
+    assert.equal(response.status, 200)
+    assert.deepEqual(response.body.countries, [{ code: "in", score: 98 }])
+    assert.equal(response.headers["Cache-Control"], "no-store")
+  }
+  for (const body of [null, [], 1, "{", { query: "" }, { query: "a".repeat(241) }]) {
+    assert.equal((await invokeHostedHandler(handler, { body })).status, 400)
+  }
+  assert.equal((await invokeHostedHandler(handler, { body: { query: "India", extra: "a".repeat(4096) } })).status, 413)
+  const headers = { host: "lab.example.com", origin: "https://lab.example.com", "content-type": "application/json", "content-length": "4097" }
+  assert.equal((await invokeHostedHandler(handler, { headers })).status, 413)
+  const throwingRequest = { method: "POST", headers: { ...headers, "content-length": "1" }, get body() { throw new SyntaxError("private parse details") } }
+  const response = new EventEmitter()
+  response.writeHead = status => { response.status = status }
+  response.end = text => { response.body = text }
+  await handler(throwingRequest, response)
+  assert.equal(response.status, 400)
+  assert.ok(!response.body.includes("private parse details"))
+  assert.equal(calls, 1)
+})
+
+test("hosted origin allowlist rejects forged hosts and cross-origin requests", async () => {
+  let calls = 0
+  const handler = createCountrySearchHandler({
+    allowedOrigins: ["https://lab.example.com", "https://preview.example.vercel.app"],
+    apiKey: "test-key-not-real",
+    evaluate: async ({ questions }) => { calls++; return answersFor(questions) },
+  })
+  const base = { host: "lab.example.com", origin: "https://lab.example.com", "content-type": "application/json" }
+  for (const change of [
+    { origin: "https://evil.example" }, { origin: "http://lab.example.com" },
+    { host: "evil.example", origin: "https://evil.example", "x-forwarded-host": "lab.example.com" },
+    { origin: "https://preview.example.vercel.app" }, { "sec-fetch-site": "cross-site" },
+    { host: "127.0.0.1:12345", origin: "http://127.0.0.1:12345" },
+  ]) assert.equal((await invokeHostedHandler(handler, { headers: { ...base, ...change } })).status, 403)
+  assert.equal(calls, 0)
+  assert.equal((await invokeHostedHandler(handler, { headers: { ...base, host: "preview.example.vercel.app", origin: "https://preview.example.vercel.app" } })).status, 200)
+  assert.equal((await invokeHostedHandler(handler, { headers: { host: "lab.example.com", "content-type": "application/json" } })).status, 200)
+  const unconfigured = createCountrySearchHandler({ allowedOrigins: [] })
+  assert.equal((await invokeHostedHandler(unconfigured)).status, 403)
+})
+
+test("Vercel endpoint shares the handler and allows only its deployment and configured domains", async () => {
+  let calls = 0
+  const environment = {
+    VERCEL: "1",
+    VERCEL_URL: "lab-hash.vercel.app",
+    VERCEL_BRANCH_URL: "lab-git-main.vercel.app",
+    VERCEL_PROJECT_PRODUCTION_URL: "lab.vercel.app",
+    JEV_ALLOWED_ORIGINS: "https://lab.example.com, https://www.lab.example.com/",
+  }
+  const module = { exports: {} }
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../api/jev-country.js"), "utf8"), {
+    module,
+    process: { env: environment },
+    require: name => {
+      assert.equal(name, "../jev-country/server.cjs")
+      return { createCountrySearchHandler: options => createCountrySearchHandler({
+        ...options,
+        openJevApiKey: "test-openjev-key-not-real",
+        fetchOpenJev: async (_url, options) => {
+          calls++
+          const { questions } = JSON.parse(options.body)
+          assert.equal(Object.keys(questions).length, 195)
+          return Response.json(openJevAnswersFor(questions, { in: .97 }))
+        },
+      }) }
+    },
+  })
+  assert.equal(typeof module.exports, "function")
+  for (const host of ["lab-hash.vercel.app", "lab-git-main.vercel.app", "lab.vercel.app", "lab.example.com", "www.lab.example.com"]) {
+    const response = await invokeHostedHandler(module.exports, {
+      headers: { host, origin: `https://${host}`, "content-type": "application/json" },
+      body: { query: "India" },
+    })
+    assert.equal(response.status, 200)
+    assert.equal(response.body.provider, "openjev")
+    assert.deepEqual(response.body.countries, [{ code: "in", score: 97 }])
+  }
+  assert.equal(calls, 1)
+  assert.equal((await invokeHostedHandler(module.exports, { method: "GET" })).status, 405)
+  assert.equal((await invokeHostedHandler(module.exports, { headers: { host: "other.vercel.app", origin: "https://other.vercel.app" } })).status, 403)
+})
 
 test("evaluates all 195 countries, ranks real probabilities, and caches queries", async context => {
   let calls = 0
@@ -277,6 +386,43 @@ test("limits concurrent evaluations and aborts them when clients disconnect", { 
   await aborted
   assert.deepEqual(await Promise.all(pending), ["AbortError", "AbortError"])
   assert.ok(signals.every(signal => signal.aborted))
+})
+
+test("Vercel static build publishes browser assets without secrets or server sources", async context => {
+  const { buildStatic } = require("../common/build-static.cjs")
+  const root = fs.mkdtempSync(path.join(require("node:os").tmpdir(), "lab-static-test-"))
+  context.after(() => fs.rmSync(root, { recursive: true, force: true }))
+  for (const directory of ["assets", "isometric-room", "jev-country", "procedurally-fish-animation", "vintage-tv"]) {
+    fs.mkdirSync(path.join(root, directory), { recursive: true })
+  }
+  const fixtures = {
+    "index.html": "<html>Lab</html>", "robots.txt": "User-agent: *", "sitemap.xml": "<urlset/>",
+    "assets/flag.svg": "<svg/>", "jev-country/index.html": "<html>Countries</html>",
+    "jev-country/logic/data.js": "const countries = []", "jev-country/logic/country-stats.js": "const stats = {}",
+    "vintage-tv/channels.json": "[]", "isometric-room/interactions.css": "body {}",
+    ".env.local": "fake-secret", ".vscode/launch.json": "{}", "node_modules/private.js": "private",
+    "api/jev-country.js": "server-only", "jev-country/server.cjs": "server-only",
+    "jev-country/server.test.cjs": "tests", "jev-country/logic/example.test.js": "tests",
+    "jev-country/demo/record.cjs": "recording-helper", "jev-country/demo/preview.mp4": "video",
+    "jev-country/logic/.private.json": "private", "vintage-tv/build-tv.py": "build-script",
+  }
+  for (const [relative, text] of Object.entries(fixtures)) {
+    fs.mkdirSync(path.dirname(path.join(root, relative)), { recursive: true })
+    fs.writeFileSync(path.join(root, relative), text)
+  }
+  const output = await buildStatic(root)
+  for (const relative of ["index.html", "robots.txt", "sitemap.xml", "assets/flag.svg", "jev-country/index.html", "jev-country/logic/data.js", "jev-country/logic/country-stats.js", "vintage-tv/channels.json", "isometric-room/interactions.css"]) {
+    assert.equal(fs.readFileSync(path.join(output, relative), "utf8"), fixtures[relative])
+  }
+  for (const relative of [".env.local", ".vscode", "node_modules", "api", "jev-country/server.cjs", "jev-country/server.test.cjs", "jev-country/logic/example.test.js", "jev-country/demo", "jev-country/logic/.private.json", "vintage-tv/build-tv.py"]) {
+    assert.equal(fs.existsSync(path.join(output, relative)), false, relative)
+  }
+  fs.unlinkSync(path.join(root, "assets/flag.svg"))
+  await buildStatic(root)
+  assert.equal(fs.existsSync(path.join(output, "assets/flag.svg")), false)
+  fs.unlinkSync(path.join(output, ".lab-static-build"))
+  await assert.rejects(buildStatic(root), /Refusing to replace dist/)
+  assert.equal(fs.existsSync(path.join(output, "index.html")), true)
 })
 
 test("shared server opens the lab index and blocks private paths including Windows aliases", { timeout: 10000 }, async context => {

@@ -73,6 +73,15 @@ npm start
 Open **http://127.0.0.1:3000/**. No build step. Project-specific requirements,
 including optional API keys, live in the READMEs above.
 
+## Deploy to Vercel
+
+Import the repository root with the **Other** framework preset. The included
+[configuration](vercel.json) builds browser assets into `dist` and deploys
+[the country-search API](api/jev-country.js) at `/api/jev-country`.
+See [Jev Country deployment](jev-country/README.md#vercel) for provider keys,
+custom-domain origins, and public-endpoint limits. GitHub Pages remains
+static-only and cannot run the API.
+
 ---
 
 <p align="center">

@@ -66,14 +66,46 @@ Run `npm test` from the repository root for offline API tests.
 
 ## Deployment
 
-The live page needs a server-side `POST /api/jev-country` endpoint and a secret
-key for the selected provider. GitHub Pages and static-only hosting cannot
-execute it; use mock mode there unless a backend is provided.
+### Vercel
 
-The included Node server is loopback-only for local development. Public
-deployment needs a backend adapted to the target host, authentication or
-abuse protection, and shared rate limits. Do not publish local environment
-files. No production backend is included in this setup.
+The [Vercel function](../api/jev-country.js) serves `POST /api/jev-country`
+using the same [search handler](server.cjs) as the local Node server.
+The frontend already calls this same-origin URL; no browser configuration
+or exposed API keys are needed.
+
+1. Import this repository into Vercel with the repository root as the Root
+  Directory and **Other** as the Framework Preset. Use Node.js 24.x.
+2. Keep the build settings from [vercel.json](../vercel.json): `npm run build`
+  and output directory `dist`. The build copies browser assets only;
+  the API is deployed separately as a Node function with its country catalog.
+3. Add `OPENJEV_API_KEY` to the Vercel environment variables for the deployment
+  environments you use. Add `VERCEL_AI_KEY` or `AI_GATEWAY_API_KEY` only if
+  you also want the optional Vercel AI Gateway provider.
+4. For a custom domain, add `JEV_ALLOWED_ORIGINS`, for example
+  `https://lab.blueedge.me`. Multiple origins can be comma-separated.
+  Vercel deployment, branch, and production URLs are recognized through
+  `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERCEL_PROJECT_PRODUCTION_URL`.
+  Keep Vercel's system environment variables exposed to the function.
+5. Deploy, attach your custom domain to the Vercel project if applicable,
+  and open `/jev-country/`. Redeploy after changing environment variables.
+
+The function has a 30-second platform budget; provider requests still time
+out after 20 seconds. Requests must target an allowed host and, when an
+Origin header is present, it must match that host's configured origin.
+This does not allow a separate GitHub Pages frontend to call the API.
+
+The cache, concurrency cap, and rate limiter are **per warm function instance**,
+not deployment-wide. Origin checks are not authentication and do not stop
+direct scripted requests. Before public promotion, configure Vercel Firewall
+rate limiting or authentication and provider spending limits. Use a shared
+store if you need a strict global quota. Client cancellation behavior on the
+host also depends on Vercel's function settings; the provider timeout remains
+the upper bound within each running request.
+
+Do not upload `.env.local` or put keys in frontend variables. The local server
+remains loopback-only, and `npm start` still works without Vercel tooling.
+GitHub Pages cannot execute the function; use mock mode there, or host this
+frontend and API together on Vercel.
 
 ## References
 
