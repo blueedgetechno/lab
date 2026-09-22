@@ -91,4 +91,4 @@ static-only and cannot run the API.
   <img src="https://img.shields.io/badge/Blender-e87d0d?style=for-the-badge&amp;logo=blender&amp;logoColor=white" alt="Blender" />
 </p>
 
-<p align="center"><a href="https://blueedge.me">blueedge.me</a> &middot; <a href="https://twitter.com/blueedgetechno">Follow the experiments</a> &middot; <a href="https://github.com/blueedgetechno/lab/issues">Share an idea</a></p>
+<p align="center"><a href="https://blueedge.me">blueedge.me</a> &middot; <a href="https://x.com/blueedgetechno">Follow the experiments</a> &middot; <a href="https://github.com/blueedgetechno/lab/issues">Share an idea</a></p>
