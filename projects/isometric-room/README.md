@@ -1,8 +1,8 @@
 # Cozy Room
 
-[Back to the lab](../README.md) | [Live experiment](https://lab.blueedge.me/isometric-room/)
+[Back to the lab](../../README.md) | [Live experiment](https://lab.blueedge.me/projects/isometric-room/)
 
-[![An interactive isometric bedroom with miniature furniture](../assets/cozy-room-preview.png)](https://lab.blueedge.me/isometric-room/)
+[![An interactive isometric bedroom with miniature furniture](../../assets/cozy-room-preview.png)](https://lab.blueedge.me/projects/isometric-room/)
 
 A small, interactive isometric bedroom built with Three.js and GLB assets.
 Explore the room, interact with its objects, switch the lighting, and enable
@@ -10,8 +10,8 @@ synthesized sound effects.
 
 ## Run Locally
 
-Follow the [shared setup](../README.md#run-locally), then open
-http://127.0.0.1:3000/isometric-room/.
+Follow the [shared setup](../../README.md#run-locally), then open
+http://127.0.0.1:3000/projects/isometric-room/.
 Use HTTP rather than opening the page directly: the scene loads binary models.
 An internet connection is needed for CDN-hosted dependencies.
 

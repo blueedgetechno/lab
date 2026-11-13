@@ -1,8 +1,8 @@
 # Jev Country
 
-[Back to the lab](../README.md) | [Live page](https://lab.blueedge.me/jev-country/)
+[Back to the lab](../../README.md) | [Live page](https://lab.blueedge.me/projects/jev-country/)
 
-[![Jev Country search interface with colorful country flags](../assets/jev-country-preview.png)](https://lab.blueedge.me/jev-country/)
+[![Jev Country search interface with colorful country flags](../../assets/jev-country-preview.png)](https://lab.blueedge.me/projects/jev-country/)
 
 Ask a question about the world and find matching countries. This experiment
 uses TypeSafe AI's Jev evaluation model through OpenJev or Vercel AI Gateway,
@@ -10,11 +10,11 @@ with a local mock mode for exploring without credentials.
 
 ## Run Locally
 
-Follow the [shared setup](../README.md#run-locally) with Node.js 22 or newer,
-then open http://127.0.0.1:3000/jev-country/.
+Follow the [shared setup](../../README.md#run-locally) with Node.js 22 or newer,
+then open http://127.0.0.1:3000/projects/jev-country/.
 
 For live search, set `OPENJEV_API_KEY` in the server environment or an ignored
-`.env.local` file at the repository root; see [.env.example](../.env.example).
+`.env.local` file at the repository root; see [.env.example](../../.env.example).
 For the optional Gateway provider, set `VERCEL_AI_KEY` (or `AI_GATEWAY_API_KEY`).
 Restart the server after changing keys. The VS Code **Launch local server**
 configuration also reads that file.
@@ -54,7 +54,8 @@ immediately; a replacement search starts after one second of idle typing.
 - Curated descriptions and the World Bank snapshot remain separate from
   model output. See [data sources](logic/SOURCES.md) for provenance.
 - Provider caches are separate; timeouts and request limits are shared.
-  There is no automatic provider fallback, and errors never substitute mock answers.
+  There is no automatic provider fallback. If a live search fails, matching
+  curated mock results are shown when available and labeled as illustrative.
 - Superseded browser requests are cancelled to avoid showing stale results.
 
 Requests have a 20-second provider timeout, no automatic retries, a
@@ -68,14 +69,14 @@ Run `npm test` from the repository root for offline API tests.
 
 ### Vercel
 
-The [Vercel function](../api/jev-country.js) serves `POST /api/jev-country`
+The [Vercel function](../../api/jev-country.js) serves `POST /api/jev-country`
 using the same [search handler](server.cjs) as the local Node server.
 The frontend already calls this same-origin URL; no browser configuration
 or exposed API keys are needed.
 
 1. Import this repository into Vercel with the repository root as the Root
   Directory and **Other** as the Framework Preset. Use Node.js 24.x.
-2. Keep the build settings from [vercel.json](../vercel.json): `npm run build`
+2. Keep the build settings from [vercel.json](../../vercel.json): `npm run build`
   and output directory `dist`. The build copies browser assets only;
   the API is deployed separately as a Node function with its country catalog.
 3. Add `OPENJEV_API_KEY` to the Vercel environment variables for the deployment
@@ -87,7 +88,7 @@ or exposed API keys are needed.
   `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERCEL_PROJECT_PRODUCTION_URL`.
   Keep Vercel's system environment variables exposed to the function.
 5. Deploy, attach your custom domain to the Vercel project if applicable,
-  and open `/jev-country/`. Redeploy after changing environment variables.
+  and open `/projects/jev-country/`. Redeploy after changing environment variables.
 
 The function has a 30-second platform budget; provider requests still time
 out after 20 seconds. Requests must target an allowed host and, when an

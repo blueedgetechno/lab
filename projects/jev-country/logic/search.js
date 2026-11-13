@@ -77,8 +77,22 @@ async function submitSearch(query) {
 		status.textContent = answer.countries.length ? `${source} matches: ${answer.countries.map(country => country.name).join(', ')}` : 'No matching countries.';
 	} catch (error) {
 		if (version !== searchVersion || controller.signal.aborted) return;
+		const answer = searchMockCountries(cleanQuery);
+		if (answer.countries.length) {
+			lastAnswer = answer;
+			selectedCodes = new Set(answer.countries.map(country => country.code));
+			updateFlagTargets(answer.countries);
+			emptyState.textContent = 'Search unavailable. Showing illustrative matches.';
+			emptyState.hidden = false;
+			status.textContent = `Search unavailable. Illustrative matches: ${answer.countries.map(country => country.name).join(', ')}`;
+			return;
+		}
 		lastAnswer = null; selectedCodes.clear(); updateFlagTargets([]);
-		const message = error.name === 'TimeoutError' ? 'Search timed out. Try again.' : error instanceof TypeError ? 'Could not reach Jev. Check your connection and try again.' : error.message;
+		const message = error.name === 'TimeoutError'
+			? 'Live search timed out. Try a suggested question for local results.'
+			: error instanceof TypeError
+				? 'Live search is unavailable. Check your connection or try a suggested question.'
+				: 'Live search is unavailable. Try a suggested question for local results.';
 		emptyState.textContent = message; emptyState.hidden = false;
 		status.textContent = message;
 	} finally {

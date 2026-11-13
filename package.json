@@ -4,7 +4,7 @@
   "scripts": {
     "build": "node common/build-static.cjs",
     "start": "node --env-file-if-exists=.env.local common/serve.cjs",
-    "test": "node --test jev-country/*.test.cjs"
+    "test": "node --test projects/jev-country/*.test.cjs"
   },
   "engines": {
     "node": ">=22"

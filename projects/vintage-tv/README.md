@@ -1,8 +1,8 @@
 # Analog TV
 
-[Back to the lab](../README.md) | [Live experiment](https://lab.blueedge.me/vintage-tv/)
+[Back to the lab](../../README.md) | [Live experiment](https://lab.blueedge.me/projects/vintage-tv/)
 
-[![A wooden vintage television with a channel dial and playback controls](../assets/vintage-tv-preview.png)](https://lab.blueedge.me/vintage-tv/)
+[![A wooden vintage television with a channel dial and playback controls](../../assets/vintage-tv-preview.png)](https://lab.blueedge.me/projects/vintage-tv/)
 
 A vintage wooden television you can rotate, tune, and watch. A Three.js shell
 surrounds an embedded YouTube player, with channel-switching static, animated
@@ -10,8 +10,8 @@ physical controls, and synthesized mechanical sounds.
 
 ## Run Locally
 
-Follow the [shared setup](../README.md#run-locally), then open
-http://127.0.0.1:3000/vintage-tv/.
+Follow the [shared setup](../../README.md#run-locally), then open
+http://127.0.0.1:3000/projects/vintage-tv/.
 HTTP is required for the GLB model, channel list, and YouTube player.
 Internet access is needed for YouTube and CDN-hosted dependencies.
 

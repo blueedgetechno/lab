@@ -6,11 +6,15 @@
   "functions": {
     "api/jev-country.js": {
       "maxDuration": 30,
-      "includeFiles": "jev-country/logic/{country-stats,data}.js"
+      "includeFiles": "projects/jev-country/logic/{country-stats,data}.js"
     }
   },
   "redirects": [
     { "source": "/index.html", "destination": "/", "permanent": true },
-    { "source": "/procedurally-fish-animation/index.html", "destination": "/procedurally-fish-animation/", "permanent": true }
+    { "source": "/procedurally-fish-animation/index.html", "destination": "/projects/procedurally-fish-animation/", "permanent": true },
+    { "source": "/procedurally-fish-animation/:path*", "destination": "/projects/procedurally-fish-animation/:path*", "permanent": true },
+    { "source": "/vintage-tv/:path*", "destination": "/projects/vintage-tv/:path*", "permanent": true },
+    { "source": "/isometric-room/:path*", "destination": "/projects/isometric-room/:path*", "permanent": true },
+    { "source": "/jev-country/:path*", "destination": "/projects/jev-country/:path*", "permanent": true }
   ]
 }

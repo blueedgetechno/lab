@@ -36,18 +36,18 @@ work. Project READMEs hold the implementation notes, limitations, and learnings.
 <table>
   <tr>
     <td width="50%" align="center">
-      <a href="procedurally-fish-animation/README.md"><img src="assets/fish-preview.png" width="100%" alt="Colorful procedural fish swimming in a pond" /><br /><strong>Just Keep Swimming</strong></a>
+      <a href="projects/procedurally-fish-animation/README.md"><img src="assets/fish-preview.png" width="100%" alt="Colorful procedural fish swimming in a pond" /><br /><strong>Just Keep Swimming</strong></a>
     </td>
     <td width="50%" align="center">
-      <a href="vintage-tv/README.md"><img src="assets/vintage-tv-preview.png" width="100%" alt="A wooden vintage television" /><br /><strong>Analog TV</strong></a>
+      <a href="projects/vintage-tv/README.md"><img src="assets/vintage-tv-preview.png" width="100%" alt="A wooden vintage television" /><br /><strong>Analog TV</strong></a>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <a href="isometric-room/README.md"><img src="assets/cozy-room-preview.png" width="100%" alt="An interactive isometric bedroom" /><br /><strong>Cozy Room</strong></a>
+      <a href="projects/isometric-room/README.md"><img src="assets/cozy-room-preview.png" width="100%" alt="An interactive isometric bedroom" /><br /><strong>Cozy Room</strong></a>
     </td>
     <td width="50%" align="center">
-      <a href="jev-country/README.md"><img src="assets/jev-country-preview.png" width="100%" alt="Jev Country search with colorful flags" /><br /><strong>Jev Country</strong></a>
+      <a href="projects/jev-country/README.md"><img src="assets/jev-country-preview.png" width="100%" alt="Jev Country search with colorful flags" /><br /><strong>Jev Country</strong></a>
     </td>
   </tr>
 </table>
@@ -56,10 +56,10 @@ work. Project READMEs hold the implementation notes, limitations, and learnings.
 
 | Experiment | Project README | Live |
 | --- | --- | --- |
-| Just Keep Swimming | [procedurally-fish-animation](procedurally-fish-animation/README.md) | [Open](https://lab.blueedge.me/procedurally-fish-animation/) |
-| Analog TV | [vintage-tv](vintage-tv/README.md) | [Open](https://lab.blueedge.me/vintage-tv/) |
-| Cozy Room | [isometric-room](isometric-room/README.md) | [Open](https://lab.blueedge.me/isometric-room/) |
-| Jev Country | [jev-country](jev-country/README.md) | [Open](https://lab.blueedge.me/jev-country/) |
+| Just Keep Swimming | [projects/procedurally-fish-animation](projects/procedurally-fish-animation/README.md) | [Open](https://lab.blueedge.me/projects/procedurally-fish-animation/) |
+| Analog TV | [projects/vintage-tv](projects/vintage-tv/README.md) | [Open](https://lab.blueedge.me/projects/vintage-tv/) |
+| Cozy Room | [projects/isometric-room](projects/isometric-room/README.md) | [Open](https://lab.blueedge.me/projects/isometric-room/) |
+| Jev Country | [projects/jev-country](projects/jev-country/README.md) | [Open](https://lab.blueedge.me/projects/jev-country/) |
 
 ## Run Locally
 
@@ -73,15 +73,6 @@ npm start
 Open **http://127.0.0.1:3000/**. No build step. Project-specific requirements,
 including optional API keys, live in the READMEs above.
 
-## Deploy to Vercel
-
-Import the repository root with the **Other** framework preset. The included
-[configuration](vercel.json) builds browser assets into `dist` and deploys
-[the country-search API](api/jev-country.js) at `/api/jev-country`.
-See [Jev Country deployment](jev-country/README.md#vercel) for provider keys,
-custom-domain origins, and public-endpoint limits. GitHub Pages remains
-static-only and cannot run the API.
-
 ---
 
 <p align="center">
@@ -91,4 +82,4 @@ static-only and cannot run the API.
   <img src="https://img.shields.io/badge/Blender-e87d0d?style=for-the-badge&amp;logo=blender&amp;logoColor=white" alt="Blender" />
 </p>
 
-<p align="center"><a href="https://blueedge.me">blueedge.me</a> &middot; <a href="https://x.com/blueedgetechno">Follow the experiments</a> &middot; <a href="https://github.com/blueedgetechno/lab/issues">Share an idea</a></p>
+<p align="center"><a href="https://blueedge.me">blueedge.me</a> &middot; <a href="https://twitter.com/blueedgetechno">Follow the experiments</a> &middot; <a href="https://github.com/blueedgetechno/lab/issues">Share an idea</a></p>

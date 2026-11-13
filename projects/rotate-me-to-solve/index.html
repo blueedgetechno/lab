@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unfolded Rubik's Cube</title>
+    <style>
+      * { box-sizing: border-box; }
+      html { scrollbar-gutter: stable both-edges; }
+      body {
+        margin: 0;
+        min-height: 100svh;
+        display: grid;
+        place-items: start center;
+        background: #f9dede;
+        color: #201919;
+        font-family: system-ui, sans-serif;
+      }
+      main { width: min(100% - 24px, 620px); padding: 28px 0; }
+      .toolbar { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+      #play[aria-pressed="true"] { background: #60d436; border-color: #287b0b; }
+      .actions[hidden] { display: none; }
+      .face[role="button"] { cursor: pointer; }
+      .face:focus-visible { outline: 3px solid #7255b5; outline-offset: 3px; }
+      .net {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        width: 100%;
+      }
+      .face {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        aspect-ratio: 1;
+        border: 1px solid #000;
+        background: #000;
+        gap: 1px;
+      }
+      .face[data-face="U"] { grid-area: 1 / 2; }
+      .face[data-face="L"] { grid-area: 2 / 1; }
+      .face[data-face="F"] { grid-area: 2 / 2; }
+      .face[data-face="R"] { grid-area: 2 / 3; }
+      .face[data-face="B"] { grid-area: 2 / 4; }
+      .face[data-face="D"] { grid-area: 3 / 2; }
+      .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+      button, textarea { font: inherit; }
+      button {
+        cursor: pointer;
+        padding: 10px 16px;
+        border: 1px solid #201919;
+        border-radius: 6px;
+        background: #fff8f8;
+        color: inherit;
+      }
+      button:hover { background: #fff; }
+      button:focus-visible, textarea:focus-visible { outline: 3px solid #7255b5; outline-offset: 3px; }
+      #random { display: grid; place-items: center; padding: 10px; }
+      #scramble { text-align: center; line-height: 1.6; overflow-wrap: anywhere; min-height: 26px; }
+      .hint { text-align: center; color: #655757; font-size: 13px; }
+      #progress:not(:empty), #check-result:not(:empty) {
+        padding: 12px 16px;
+        border: 1px solid #7255b5;
+        border-radius: 8px;
+        background: #eee5ff;
+        color: #45267c;
+        font-size: 15px;
+        font-weight: 700;
+      }
+      #progress[data-state="correct"], #check-result[data-state="correct"] {
+        border-color: #287b0b;
+        background: #def5d4;
+        color: #205e0d;
+      }
+      #check-result[data-state="incorrect"] {
+        border-color: #b52b2b;
+        background: #ffe5e5;
+        color: #941c1c;
+      }
+      #confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1000; }
+      #confetti span { position: absolute; width: 7px; height: 11px; }
+      dialog {
+        width: min(100% - 32px, 460px);
+        border: 1px solid #201919;
+        border-radius: 10px;
+        background: #fff8f8;
+        padding: 24px;
+      }
+      dialog::backdrop { background: #0006; }
+      h1 { font-size: 20px; margin: 0 0 18px; }
+      label { display: block; margin-bottom: 8px; }
+      textarea { width: 100%; min-height: 100px; padding: 10px; resize: vertical; }
+      #error { color: #a01616; min-height: 24px; }
+      dialog .actions { justify-content: flex-end; margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="toolbar"><button id="play" type="button" aria-pressed="false" title="Start or exit play mode">Play</button></div>
+      <div class="net" role="group" aria-label="Unfolded Rubik's Cube: top, left, front, right, back, bottom">
+        <div class="face" data-face="U" role="group" aria-label="Up face"></div>
+        <div class="face" data-face="L" role="group" aria-label="Left face"></div>
+        <div class="face" data-face="F" role="group" aria-label="Front face"></div>
+        <div class="face" data-face="R" role="group" aria-label="Right face"></div>
+        <div class="face" data-face="B" role="group" aria-label="Back face"></div>
+        <div class="face" data-face="D" role="group" aria-label="Down face"></div>
+      </div>
+      <div id="setup-actions" class="actions">
+        <button id="input" type="button">Input moves</button>
+        <button id="random" type="button" aria-label="Random 20 to 25 move scramble" title="Random 20–25 move scramble">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5" />
+            <g fill="currentColor">
+              <circle cx="7" cy="7" r="1.5" /><circle cx="17" cy="7" r="1.5" />
+              <circle cx="12" cy="12" r="1.5" />
+              <circle cx="7" cy="17" r="1.5" /><circle cx="17" cy="17" r="1.5" />
+            </g>
+          </svg>
+        </button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+      <section id="game" aria-label="Orientation game" hidden>
+        <p class="hint">Click a face to rotate it 90° clockwise. Find any physically solvable cube.</p>
+        <p id="progress" class="hint" role="status" aria-live="polite" hidden></p>
+        <div class="actions">
+          <button id="toggle-progress" type="button" aria-pressed="true">Show indicator</button>
+        </div>
+        <p class="hint">The indicator counts faces matching the closest valid arrangement.</p>
+      </section>
+      <p id="check-result" class="hint" role="status" aria-live="polite"></p>
+      <p id="scramble" role="status" aria-live="polite">Solved</p>
+      <p id="layout-hint" class="hint">U above F · L F R B across · D below F</p>
+    </main>
+    <dialog id="move-dialog" aria-labelledby="dialog-title">
+      <form id="move-form">
+        <h1 id="dialog-title">Scramble from solved</h1>
+        <label for="moves">Moves</label>
+        <textarea id="moves" placeholder="R U R' U' F2" aria-describedby="notation error"></textarea>
+        <p id="notation" class="hint">Use U D L R F B, ' for inverse, or 2 for a half-turn. Separate moves with spaces.</p>
+        <p id="error" role="alert"></p>
+        <div class="actions">
+          <button id="cancel" type="button">Cancel</button>
+          <button type="submit">Apply scramble</button>
+        </div>
+      </form>
+    </dialog>
+    <script>
+      const faces = {
+        U: { normal: [0, 1, 0], right: [1, 0, 0], down: [0, 0, 1], color: "#ffffff", name: "white" },
+        L: { normal: [-1, 0, 0], right: [0, 0, 1], down: [0, -1, 0], color: "#f5ad36", name: "orange" },
+        F: { normal: [0, 0, 1], right: [1, 0, 0], down: [0, -1, 0], color: "#60d436", name: "green" },
+        R: { normal: [1, 0, 0], right: [0, 0, -1], down: [0, -1, 0], color: "#ed2c1d", name: "red" },
+        B: { normal: [0, 0, -1], right: [-1, 0, 0], down: [0, -1, 0], color: "#1000ed", name: "blue" },
+        D: { normal: [0, -1, 0], right: [1, 0, 0], down: [0, 0, -1], color: "#ffff48", name: "yellow" },
+      }
+      const dot = (a, b) => a.reduce((sum, value, i) => sum + value * b[i], 0)
+
+      function solvedCube() {
+        return Object.entries(faces).flatMap(([face, basis]) =>
+          Array.from({ length: 9 }, (_, i) => ({
+            color: face,
+            normal: [...basis.normal],
+            position: basis.normal.map((value, axis) =>
+              value + basis.right[axis] * (i % 3 - 1) + basis.down[axis] * (Math.floor(i / 3) - 1)
+            ),
+          }))
+        )
+      }
+
+      function rotate(vector, axis, direction) {
+        const next = [...vector]
+        const a = (axis + 1) % 3
+        const b = (axis + 2) % 3
+        next[a] = -direction * vector[b]
+        next[b] = direction * vector[a]
+        return next
+      }
+
+      function applyMove(cube, move) {
+        const normal = faces[move[0]].normal
+        const axis = normal.findIndex(value => value !== 0)
+        const layer = normal[axis]
+        const turns = move.endsWith("2") ? 2 : move.endsWith("'") ? 3 : 1
+        for (let turn = 0; turn < turns; turn++) {
+          for (const sticker of cube) {
+            if (sticker.position[axis] !== layer) continue
+            sticker.position = rotate(sticker.position, axis, -layer)
+            sticker.normal = rotate(sticker.normal, axis, -layer)
+          }
+        }
+      }
+
+      const cells = {}
+      for (const face of Object.keys(faces)) {
+        const element = document.querySelector(`[data-face="${face}"]`)
+        cells[face] = Array.from({ length: 9 }, () => {
+          const cell = document.createElement("div")
+          element.appendChild(cell)
+          return cell
+        })
+      }
+
+      function faceColors(cube) {
+        const result = Object.fromEntries(Object.keys(faces).map(face => [face, Array(9)]))
+        for (const sticker of cube) {
+          const face = Object.keys(faces).find(face => dot(sticker.normal, faces[face].normal) === 1)
+          const basis = faces[face]
+          const row = dot(sticker.position, basis.down) + 1
+          const column = dot(sticker.position, basis.right) + 1
+          result[face][row * 3 + column] = sticker.color
+        }
+        return result
+      }
+
+      function renderColors(colors) {
+        for (const face of Object.keys(faces)) {
+          colors[face].forEach((color, i) => {
+            const cell = cells[face][i]
+            cell.style.backgroundColor = faces[color].color
+            cell.setAttribute("aria-label", `${faces[color].name}, row ${Math.floor(i / 3) + 1}, column ${i % 3 + 1}`)
+          })
+        }
+        const valid = isValidCube(colors)
+        checkResult.dataset.state = valid ? "correct" : "incorrect"
+        checkResult.textContent = valid
+          ? "Physically solvable"
+          : "Not physically solvable"
+      }
+
+      const dialog = document.querySelector("#move-dialog")
+      const input = document.querySelector("#moves")
+      const error = document.querySelector("#error")
+      const status = document.querySelector("#scramble")
+      const gamePanel = document.querySelector("#game")
+      const progress = document.querySelector("#progress")
+      const toggleProgress = document.querySelector("#toggle-progress")
+      const checkResult = document.querySelector("#check-result")
+      let game = null
+      let indicatorVisible = false
+
+      function rotateFace(colors) {
+        return [6, 3, 0, 7, 4, 1, 8, 5, 2].map(i => colors[i])
+      }
+
+      // Facelets are listed in cubie orientation order, clockwise around each corner.
+      const cornerFacelets = [
+        ["U8", "R0", "F2"], ["U6", "F0", "L2"],
+        ["U0", "L0", "B2"], ["U2", "B0", "R2"],
+        ["D2", "F8", "R6"], ["D0", "L8", "F6"],
+        ["D6", "B8", "L6"], ["D8", "R8", "B6"],
+      ]
+      const edgeFacelets = [
+        ["U5", "R1"], ["U7", "F1"], ["U3", "L1"], ["U1", "B1"],
+        ["D5", "R7"], ["D1", "F7"], ["D3", "L7"], ["D7", "B7"],
+        ["F5", "R3"], ["F3", "L5"], ["B5", "L3"], ["B3", "R5"],
+      ]
+      const cornerColors = cornerFacelets.map(piece => piece.map(facelet => facelet[0]))
+      const edgeColors = edgeFacelets.map(piece => piece.map(facelet => facelet[0]))
+
+      function parity(permutation) {
+        let result = 0
+        for (let i = 0; i < permutation.length; i++) {
+          for (let j = i + 1; j < permutation.length; j++) {
+            if (permutation[i] > permutation[j]) result ^= 1
+          }
+        }
+        return result
+      }
+
+      function isValidCube(colors) {
+        const read = facelet => colors[facelet[0]][Number(facelet[1])]
+        if (Object.keys(faces).some(face => colors[face][4] !== face)) return false
+        const corners = []
+        let twists = 0
+        for (const facelets of cornerFacelets) {
+          const piece = facelets.map(read)
+          const orientation = piece.findIndex(color => color === "U" || color === "D")
+          if (orientation === -1) return false
+          const id = cornerColors.findIndex(candidate =>
+            candidate.every((color, i) => color === piece[(orientation + i) % 3])
+          )
+          if (id === -1 || corners.includes(id)) return false
+          corners.push(id)
+          twists += orientation
+        }
+        if (twists % 3 !== 0) return false
+        const edges = []
+        let flips = 0
+        for (const facelets of edgeFacelets) {
+          const piece = facelets.map(read)
+          let id = edgeColors.findIndex(candidate => candidate[0] === piece[0] && candidate[1] === piece[1])
+          if (id === -1) {
+            id = edgeColors.findIndex(candidate => candidate[0] === piece[1] && candidate[1] === piece[0])
+            flips++
+          }
+          if (id === -1 || edges.includes(id)) return false
+          edges.push(id)
+        }
+        return flips % 2 === 0 && parity(corners) === parity(edges)
+      }
+
+      function validArrangements(variants) {
+        const solutions = []
+        const faceNames = Object.keys(faces)
+        const colors = {}
+        const orientations = []
+        function search(index) {
+          if (index === faceNames.length) {
+            if (isValidCube(colors)) solutions.push([...orientations])
+            return
+          }
+          const face = faceNames[index]
+          for (let rotation = 0; rotation < 4; rotation++) {
+            colors[face] = variants[face][rotation]
+            orientations[index] = rotation
+            search(index + 1)
+          }
+        }
+        search(0)
+        return solutions
+      }
+
+      function currentColors() {
+        return Object.fromEntries(Object.keys(faces).map((face, i) =>
+          [face, game.variants[face][game.orientations[i]]]
+        ))
+      }
+
+      function correctFaceCount() {
+        return Math.max(...game.solutions.map(solution =>
+          Object.keys(faces).reduce((count, face, i) => count + Number(
+            game.variants[face][solution[i]].every((color, j) =>
+              color === game.variants[face][game.orientations[i]][j]
+            )
+          ), 0)
+        ))
+      }
+
+      function updateGame() {
+        renderColors(currentColors())
+        progress.hidden = !indicatorVisible
+        const count = indicatorVisible ? correctFaceCount() : null
+        progress.textContent = indicatorVisible ? `${count} out of 6 faces are correct` : ""
+        progress.dataset.state = count === 6 ? "correct" : "progress"
+        toggleProgress.textContent = indicatorVisible ? "Hide indicator" : "Show indicator"
+        toggleProgress.setAttribute("aria-pressed", String(!indicatorVisible))
+      }
+
+      function setGameInteraction(active) {
+        clearConfetti()
+        gamePanel.hidden = !active
+        document.querySelector("#play").setAttribute("aria-pressed", String(active))
+        document.querySelector("#setup-actions").hidden = active
+        document.querySelector("#layout-hint").hidden = active
+        status.hidden = active
+        for (const element of document.querySelectorAll(".face")) {
+          element.getAnimations().forEach(animation => animation.cancel())
+          element.setAttribute("role", active ? "button" : "group")
+          if (active) element.tabIndex = 0
+          else element.removeAttribute("tabindex")
+        }
+      }
+
+      function turnFace(face) {
+        if (!game) return
+        const wasValid = isValidCube(currentColors())
+        const element = document.querySelector(`[data-face="${face}"]`)
+        element.getAnimations().forEach(animation => animation.finish())
+        const index = Object.keys(faces).indexOf(face)
+        game.orientations[index] = (game.orientations[index] + 1) % 4
+        updateGame()
+        if (!wasValid && checkResult.dataset.state === "correct") celebrate()
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          // The new sticker layout rotated back 90 degrees matches the previous layout.
+          element.animate(
+            [{ transform: "rotate(-90deg)" }, { transform: "rotate(0deg)" }],
+            { duration: 180, easing: "ease-out" },
+          )
+        }
+      }
+
+      function clearConfetti() {
+        const overlay = document.querySelector("#confetti")
+        if (!overlay) return
+        overlay.getAnimations({ subtree: true }).forEach(animation => animation.cancel())
+        overlay.remove()
+      }
+
+      function celebrate() {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+        clearConfetti()
+        const overlay = document.createElement("div")
+        overlay.id = "confetti"
+        overlay.setAttribute("aria-hidden", "true")
+        document.body.appendChild(overlay)
+        const bounds = document.querySelector(".net").getBoundingClientRect()
+        const palette = Object.values(faces).map(face => face.color)
+        for (let i = 0; i < 80; i++) {
+          const particle = document.createElement("span")
+          particle.style.left = `${bounds.x + bounds.width / 2}px`
+          particle.style.top = `${bounds.y + bounds.height / 2}px`
+          particle.style.backgroundColor = palette[i % palette.length]
+          overlay.appendChild(particle)
+          const duration = 1800 + Math.random() * 400
+          const velocityX = (Math.random() - 0.5) * innerWidth
+          const velocityY = -250 - Math.random() * 350
+          const spin = (Math.random() - 0.5) * 1080
+          const keyframes = Array.from({ length: 21 }, (_, frame) => {
+            const fraction = frame / 20
+            const time = fraction * duration / 1000
+            const x = velocityX * time
+            const y = velocityY * time + (innerHeight + 600) * time * time / 2
+            return {
+              transform: `translate(${x}px, ${y}px) rotate(${spin * fraction}deg)`,
+              opacity: fraction < 0.8 ? 1 : (1 - fraction) / 0.2,
+            }
+          })
+          particle.animate(keyframes, { duration, easing: "linear", fill: "forwards" })
+        }
+        overlay.animate([{ opacity: 1 }, { opacity: 1 }], { duration: 2200 }).onfinish = clearConfetti
+      }
+
+      for (const element of document.querySelectorAll(".face")) {
+        element.addEventListener("click", () => turnFace(element.dataset.face))
+        element.addEventListener("keydown", event => {
+          if (!game || (event.key !== "Enter" && event.key !== " ")) return
+          event.preventDefault()
+          turnFace(element.dataset.face)
+        })
+      }
+
+      document.querySelector("#play").addEventListener("click", () => {
+        if (game) {
+          scramble([])
+          return
+        }
+        const cube = solvedCube()
+        randomScramble().forEach(move => applyMove(cube, move))
+        const colors = faceColors(cube)
+        const variants = Object.fromEntries(Object.entries(colors).map(([face, original]) => {
+          const rotations = [original]
+          for (let i = 1; i < 4; i++) rotations.push(rotateFace(rotations[i - 1]))
+          return [face, rotations]
+        }))
+        game = {
+          variants,
+          solutions: validArrangements(variants),
+          orientations: Object.keys(faces).map(() => Math.floor(Math.random() * 4)),
+        }
+        setGameInteraction(true)
+        status.textContent = "Orientation game"
+        input.value = ""
+        updateGame()
+      })
+
+      toggleProgress.addEventListener("click", () => {
+        indicatorVisible = !indicatorVisible
+        updateGame()
+      })
+
+      function scramble(moves) {
+        game = null
+        setGameInteraction(false)
+        const cube = solvedCube()
+        for (const move of moves) applyMove(cube, move)
+        renderColors(faceColors(cube))
+        status.textContent = moves.length ? moves.join(" ") : "Solved"
+      }
+
+      document.querySelector("#input").addEventListener("click", () => {
+        error.textContent = ""
+        input.removeAttribute("aria-invalid")
+        dialog.showModal()
+        input.focus()
+      })
+      document.querySelector("#cancel").addEventListener("click", () => dialog.close())
+      document.querySelector("#move-form").addEventListener("submit", event => {
+        event.preventDefault()
+        const text = input.value.trim().replaceAll("\u2019", "'")
+        const moves = text ? text.split(/\s+/) : []
+        const invalid = moves.find(move => !/^[UDLRFB](?:2|')?$/.test(move))
+        if (!moves.length || invalid) {
+          error.textContent = invalid ? `Invalid move "${invalid}". Use notation such as R, U', or F2.` : "Enter at least one move."
+          input.setAttribute("aria-invalid", "true")
+          input.focus()
+          return
+        }
+        input.removeAttribute("aria-invalid")
+        error.textContent = ""
+        scramble(moves)
+        dialog.close()
+      })
+
+      function randomScramble() {
+        const length = 20 + Math.floor(Math.random() * 6)
+        const suffixes = ["", "'", "2"]
+        const moves = []
+        let previousAxis = -1
+        for (let i = 0; i < length; i++) {
+          const choices = Object.keys(faces).filter(face => faces[face].normal[previousAxis] === 0 || previousAxis === -1)
+          const face = choices[Math.floor(Math.random() * choices.length)]
+          moves.push(face + suffixes[Math.floor(Math.random() * suffixes.length)])
+          previousAxis = faces[face].normal.findIndex(value => value !== 0)
+        }
+        return moves
+      }
+
+      document.querySelector("#random").addEventListener("click", () => {
+        const moves = randomScramble()
+        input.value = moves.join(" ")
+        scramble(moves)
+      })
+      document.querySelector("#reset").addEventListener("click", () => {
+        input.value = ""
+        scramble([])
+      })
+      scramble([])
+    </script>
+  </body>
+</html>

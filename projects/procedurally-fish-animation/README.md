@@ -1,8 +1,8 @@
 # Just Keep Swimming
 
-[Back to the lab](../README.md) | [Live experiment](https://lab.blueedge.me/procedurally-fish-animation/)
+[Back to the lab](../../README.md) | [Live experiment](https://lab.blueedge.me/projects/procedurally-fish-animation/)
 
-[![Colorful procedural fish swimming in a pale green pond](../assets/fish-preview.png)](https://lab.blueedge.me/procedurally-fish-animation/)
+[![Colorful procedural fish swimming in a pale green pond](../../assets/fish-preview.png)](https://lab.blueedge.me/projects/procedurally-fish-animation/)
 
 An interactive school of procedural fish with articulated spines,
 species-specific shapes and markings, collision avoidance, and swimming across
@@ -10,8 +10,8 @@ wrapping canvas edges. Built with p5.js, FIK inverse kinematics, and Canvas 2D.
 
 ## Run Locally
 
-Open [index.html](index.html) directly, or follow the [shared setup](../README.md#run-locally)
-and visit http://127.0.0.1:3000/procedurally-fish-animation/.
+Open [index.html](index.html) directly, or follow the [shared setup](../../README.md#run-locally)
+and visit http://127.0.0.1:3000/projects/procedurally-fish-animation/.
 An internet connection is needed for the CDN-hosted libraries, icons, and fonts.
 
 ## Controls

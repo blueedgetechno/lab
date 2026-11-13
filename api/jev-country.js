@@ -1,4 +1,4 @@
-const { createCountrySearchHandler } = require("../jev-country/server.cjs")
+const { createCountrySearchHandler } = require("../projects/jev-country/server.cjs")
 
 const allowedOrigins = process.env.VERCEL === "1" ? [
   ...[process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]

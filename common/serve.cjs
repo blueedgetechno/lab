@@ -17,7 +17,7 @@ let countrySearchHandler
 
 const server = http.createServer(async (request, response) => {
   if (request.url?.split("?")[0] === "/api/jev-country") {
-    countrySearchHandler ||= require("../jev-country/server.cjs").createCountrySearchHandler()
+    countrySearchHandler ||= require("../projects/jev-country/server.cjs").createCountrySearchHandler()
     await countrySearchHandler(request, response)
     return
   }

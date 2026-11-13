@@ -96,11 +96,11 @@ test("Vercel endpoint shares the handler and allows only its deployment and conf
     JEV_ALLOWED_ORIGINS: "https://lab.example.com, https://www.lab.example.com/",
   }
   const module = { exports: {} }
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../api/jev-country.js"), "utf8"), {
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../../api/jev-country.js"), "utf8"), {
     module,
     process: { env: environment },
     require: name => {
-      assert.equal(name, "../jev-country/server.cjs")
+      assert.equal(name, "../projects/jev-country/server.cjs")
       return { createCountrySearchHandler: options => createCountrySearchHandler({
         ...options,
         openJevApiKey: "test-openjev-key-not-real",
@@ -389,32 +389,32 @@ test("limits concurrent evaluations and aborts them when clients disconnect", { 
 })
 
 test("Vercel static build publishes browser assets without secrets or server sources", async context => {
-  const { buildStatic } = require("../common/build-static.cjs")
+  const { buildStatic } = require("../../common/build-static.cjs")
   const root = fs.mkdtempSync(path.join(require("node:os").tmpdir(), "lab-static-test-"))
   context.after(() => fs.rmSync(root, { recursive: true, force: true }))
-  for (const directory of ["assets", "isometric-room", "jev-country", "procedurally-fish-animation", "vintage-tv"]) {
+  for (const directory of ["assets", "projects/isometric-room", "projects/jev-country", "projects/procedurally-fish-animation", "projects/vintage-tv"]) {
     fs.mkdirSync(path.join(root, directory), { recursive: true })
   }
   const fixtures = {
     "index.html": "<html>Lab</html>", "robots.txt": "User-agent: *", "sitemap.xml": "<urlset/>",
-    "assets/flag.svg": "<svg/>", "jev-country/index.html": "<html>Countries</html>",
-    "jev-country/logic/data.js": "const countries = []", "jev-country/logic/country-stats.js": "const stats = {}",
-    "vintage-tv/channels.json": "[]", "isometric-room/interactions.css": "body {}",
+    "assets/flag.svg": "<svg/>", "projects/jev-country/index.html": "<html>Countries</html>",
+    "projects/jev-country/logic/data.js": "const countries = []", "projects/jev-country/logic/country-stats.js": "const stats = {}",
+    "projects/vintage-tv/channels.json": "[]", "projects/isometric-room/interactions.css": "body {}",
     ".env.local": "fake-secret", ".vscode/launch.json": "{}", "node_modules/private.js": "private",
-    "api/jev-country.js": "server-only", "jev-country/server.cjs": "server-only",
-    "jev-country/server.test.cjs": "tests", "jev-country/logic/example.test.js": "tests",
-    "jev-country/demo/record.cjs": "recording-helper", "jev-country/demo/preview.mp4": "video",
-    "jev-country/logic/.private.json": "private", "vintage-tv/build-tv.py": "build-script",
+    "api/jev-country.js": "server-only", "projects/jev-country/server.cjs": "server-only",
+    "projects/jev-country/server.test.cjs": "tests", "projects/jev-country/logic/example.test.js": "tests",
+    "projects/jev-country/demo/record.cjs": "recording-helper", "projects/jev-country/demo/preview.mp4": "video",
+    "projects/jev-country/logic/.private.json": "private", "projects/vintage-tv/build-tv.py": "build-script",
   }
   for (const [relative, text] of Object.entries(fixtures)) {
     fs.mkdirSync(path.dirname(path.join(root, relative)), { recursive: true })
     fs.writeFileSync(path.join(root, relative), text)
   }
   const output = await buildStatic(root)
-  for (const relative of ["index.html", "robots.txt", "sitemap.xml", "assets/flag.svg", "jev-country/index.html", "jev-country/logic/data.js", "jev-country/logic/country-stats.js", "vintage-tv/channels.json", "isometric-room/interactions.css"]) {
+  for (const relative of ["index.html", "robots.txt", "sitemap.xml", "assets/flag.svg", "projects/jev-country/index.html", "projects/jev-country/logic/data.js", "projects/jev-country/logic/country-stats.js", "projects/vintage-tv/channels.json", "projects/isometric-room/interactions.css"]) {
     assert.equal(fs.readFileSync(path.join(output, relative), "utf8"), fixtures[relative])
   }
-  for (const relative of [".env.local", ".vscode", "node_modules", "api", "jev-country/server.cjs", "jev-country/server.test.cjs", "jev-country/logic/example.test.js", "jev-country/demo", "jev-country/logic/.private.json", "vintage-tv/build-tv.py"]) {
+  for (const relative of [".env.local", ".vscode", "node_modules", "api", "projects/jev-country/server.cjs", "projects/jev-country/server.test.cjs", "projects/jev-country/logic/example.test.js", "projects/jev-country/demo", "projects/jev-country/logic/.private.json", "projects/vintage-tv/build-tv.py"]) {
     assert.equal(fs.existsSync(path.join(output, relative)), false, relative)
   }
   fs.unlinkSync(path.join(root, "assets/flag.svg"))
@@ -426,7 +426,7 @@ test("Vercel static build publishes browser assets without secrets or server sou
 })
 
 test("shared server opens the lab index and blocks private paths including Windows aliases", { timeout: 10000 }, async context => {
-  const child = spawn(process.execPath, [path.join(__dirname, "../common/serve.cjs")], { env: { ...process.env, PORT: "0" } })
+  const child = spawn(process.execPath, [path.join(__dirname, "../../common/serve.cjs")], { env: { ...process.env, PORT: "0" } })
   context.after(() => child.kill())
   const [output] = await once(child.stdout, "data")
   assert.match(String(output).trim(), /^Blue Edge Lab: http:\/\/127\.0\.0\.1:\d+\/$/)
@@ -435,11 +435,11 @@ test("shared server opens the lab index and blocks private paths including Windo
   assert.equal(index.status, 200)
   assert.equal(await index.text(), await (await fetch(base + "/index.html")).text())
   assert.equal((await fetch(base + "/common/serve.cjs")).status, 403)
-  for (const resource of ["/.vscode/launch.json", "/%2evscode/launch.json", "/.env.local", "/.git/config", "/node_modules/ai/package.json", "/NODE_MODULES/ai/package.json", "/node_modules./ai/package.json", "/assets%5c..%5c.env.local", "/jev-country/server.cjs", "/jev-country/server.cjs.", "/.env.local%3A%3A$DATA"]) {
+  for (const resource of ["/.vscode/launch.json", "/%2evscode/launch.json", "/.env.local", "/.git/config", "/node_modules/ai/package.json", "/NODE_MODULES/ai/package.json", "/node_modules./ai/package.json", "/assets%5c..%5c.env.local", "/projects/jev-country/server.cjs", "/projects/jev-country/server.cjs.", "/.env.local%3A%3A$DATA"]) {
     assert.equal((await fetch(base + resource)).status, 403, resource)
   }
-  assert.equal((await fetch(base + "/jev-country/")).status, 200)
-  assert.equal((await fetch(base + "/jev-country")).status, 200)
-  assert.equal((await fetch(base + "/jev-country/logic/search.js")).status, 200)
+  assert.equal((await fetch(base + "/projects/jev-country/")).status, 200)
+  assert.equal((await fetch(base + "/projects/jev-country")).status, 200)
+  assert.equal((await fetch(base + "/projects/jev-country/logic/search.js")).status, 200)
   assert.equal((await fetch(base + "/api/jev-country")).status, 405)
 })
